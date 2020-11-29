@@ -1,20 +1,40 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="toolbar">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+</div>
+<div class="content">
+    <div class="left">
+        <div class="live">
+            <div id="media-container" class="media-container">
+                <ng-container *ngIf="activeStreamChannel; else noTransmission">
+                    <canvas id="video" class="video-2" *ngIf="activeStreamChannel.type === 'ip-camera'"></canvas>
+                </ng-container>
+                <div class="toolbar" *ngIf="activeStreamChannel">
+                    <button (click)="streamToTwitch()" *ngIf="!isLiveSteaming">Stream to Twitch</button>
+                    <button (click)="stopTwitchStream()" *ngIf="isLiveSteaming">Stop live streaming</button>
+                </div>
+            </div>
+        </div>
+        <div class="channels">
+            <app-card-video *ngFor="let channel of channels" [streamChannel]="channel"
+                            (sendToStream)="onChannelChange($event)">
+            </app-card-video>
+        </div>
+    </div>
+    <div class="right"></div>
+</div>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
-</ion-content>
+<div class="background">
+    <ng-container *ngIf="activeStreamChannel; else noTransmission">
+        <!--        <ng-container [ngSwitch]="activeStreamChannel.type">-->
+        <!--            <webcam *ngSwitchCase="'webcam'" [allowCameraSwitch]="false"></webcam>-->
+        <!--            <img *ngSwitchCase="'ip-camera'" [src]="activeStreamChannel.url">-->
+        <!--        </ng-container>-->
+    </ng-container>
+</div>
+
+
+<ng-template #noTransmission>
+    <div class="no-transmission">
+        No transmission available
+    </div>
+</ng-template>

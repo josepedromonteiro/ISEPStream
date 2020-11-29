@@ -1,27 +1,200 @@
-#container {
-  text-align: center;
+app-home {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
+  .video-2 {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+  .background {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    filter: blur(90px) saturate(180%);
 
-  color: #8c8c8c;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      opacity: .85;
+    }
 
-  margin: 0;
-}
+    img {
+      height: 100vh;
+      width: 100vw;
+      object-fit: cover;
+      z-index: -2;
+    }
 
-#container a {
-  text-decoration: none;
+    webcam {
+      height: 100vh;
+      width: 100vw;
+      object-fit: cover;
+      z-index: -2;
+      display: block;
+
+      .webcam-wrapper {
+        height: 100%;
+        width: 100%;
+
+        video {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 80px;
+    width: 100%;
+  }
+
+  .content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-grow: 1;
+    overflow: visible;
+  }
+
+  .left {
+    width: 70%;
+    overflow: scroll;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    .live {
+      flex: 1 1 0;
+      padding: 5vh;
+      overflow: hidden;
+      text-align: center;
+      position: relative;
+
+      .media-container {
+        border-radius: 30px;
+        overflow: hidden;
+        position: relative;
+        height: 100%;
+        margin: auto;
+
+        video {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .video {
+        overflow: hidden;
+        margin: auto;
+        height: 100%;
+        display: block;
+
+        .webcam-wrapper {
+          height: 100%;
+          width: 100%;
+
+          video {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+          }
+        }
+      }
+    }
+
+    .channels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: scroll;
+      padding: 20px;
+      height: 30%;
+      min-height: 300px;
+
+
+      &::after {
+        content: '';
+        padding: 10px;
+      }
+
+    }
+  }
+
+  .right {
+    width: 30%;
+    height: 100%;
+  }
+
+  .live:hover {
+    .toolbar {
+      min-height: 250px;
+      max-height: 250px;
+      padding: 20px;
+
+      button {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+
+  .live .toolbar {
+    transition: var(--transition);
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    padding: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 1) 100%);
+    max-height: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    button {
+      transition: var(--transition);
+      padding: 10px 20px;
+      background-color: rgba(255, 0, 0, 0.73);
+      font-weight: bolder;
+      text-align: center;
+      outline: none;
+      border: none;
+      font-size: 16px;
+      border-radius: 15px;
+      color: white;
+
+      opacity: 0;
+      transform: scale(0.5);
+    }
+  }
+
+  .no-transmission {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }

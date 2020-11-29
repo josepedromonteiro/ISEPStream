@@ -1,0 +1,145 @@
+:root {
+  --transtion-function: cubic-bezier(0.25, 1, 0.5, 1);
+  --transition: all .6s var(--transtion-function);
+}
+
+app-card-video {
+
+  .channel {
+    border-radius: 30px;
+    width: calc(33% - 30px);
+    min-width: 300px;
+    margin: 30px 15px;
+    height: 200px;
+    background-color: black;
+    box-shadow: 0 10px 50px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    position: relative;
+
+    .media-container {
+      height: 100%;
+      width: 100%;
+    }
+
+    audio, canvas, progress, video {
+      vertical-align: baseline;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    iframe {
+      height: 100%;
+      width: 100%;
+      border: none;
+    }
+
+    webcam {
+      display: block;
+      height: 100%;
+      width: 100%;
+
+      .webcam-wrapper {
+        height: 100%;
+        width: 100%;
+
+        video {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+
+
+    &:hover {
+
+      .topbar {
+        min-height: 100px;
+        max-height: 100px;
+        padding: 20px;
+        z-index: 9;
+
+        p {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .toolbar {
+        min-height: 150px;
+        max-height: 150px;
+        padding: 20px;
+
+        button {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    }
+
+
+    .topbar {
+      transition: var(--transition);
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      padding: 0;
+      background: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 1) 100%);
+      max-height: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      font-size: 20px;
+      font-weight: bolder;
+      color: white;
+
+      p {
+        transition: var(--transition);
+        opacity: 0;
+        transform: scale(0.5);
+        margin: 0;
+      }
+    }
+
+    .toolbar {
+      transition: var(--transition);
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      padding: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 1) 100%);
+      max-height: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+
+      button {
+        transition: var(--transition);
+        padding: 10px 20px;
+        background-color: rgba(255, 0, 0, 0.73);
+        font-weight: bolder;
+        text-align: center;
+        outline: none;
+        border: none;
+        font-size: 16px;
+        border-radius: 15px;
+        color: white;
+
+        opacity: 0;
+        transform: scale(0.5);
+      }
+    }
+
+  }
+}

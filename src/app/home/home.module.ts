@@ -5,6 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
+import { WebcamModule } from 'ngx-webcam';
+import { CardVideoComponent } from '../card-video/card-video.component';
+import { ONVIFModule } from 'onvif-rx-angular';
 
 
 @NgModule({
@@ -12,8 +15,10 @@ import { HomePageRoutingModule } from './home-routing.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule
+    HomePageRoutingModule,
+    WebcamModule,
+    ONVIFModule
   ],
-  declarations: [HomePage]
+  declarations: [HomePage, CardVideoComponent]
 })
 export class HomePageModule {}

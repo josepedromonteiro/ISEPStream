@@ -1,0 +1,16 @@
+<div class="channel">
+
+    <div class="topbar">
+        <p>
+            {{streamChannel.name}}
+        </p>
+    </div>
+    <div [attr.id]="'media-container-'+streamChannel.id" class="media-container">
+        <canvas [attr.id]="streamChannel.id" *ngIf="streamChannel.type === 'ip-camera'"></canvas>
+    </div>
+    <div class="toolbar">
+        <button (click)="sendToStream.emit(streamChannel)">
+            Send to stage
+        </button>
+    </div>
+</div>

@@ -6,10 +6,13 @@
         </p>
     </div>
     <div [attr.id]="'media-container-'+streamChannel.id" class="media-container">
-        <canvas [attr.id]="streamChannel.id" *ngIf="streamChannel.type === 'ip-camera'"></canvas>
+        <ion-icon name="desktop-outline"></ion-icon>
     </div>
     <div class="toolbar">
-        <button (click)="sendToStream.emit(streamChannel)">
+        <button *ngIf="isScreenShare && !isSharing" (click)="startSharing()">
+            Start screen share
+        </button>
+        <button *ngIf="isSharing" (click)="sendToStream.emit(streamChannel)">
             Send to stage
         </button>
     </div>

@@ -1,13 +1,15 @@
 <div class="toolbar">
-
+    <img class="logo" src="assets/images/logo.png">
 </div>
 <div class="content">
     <div class="left">
         <div class="live">
+            <div class="stage-title">
+                Stage
+            </div>
             <div id="media-container" class="media-container">
-                <ng-container *ngIf="activeStreamChannel; else noTransmission">
-                    <canvas id="video" class="video-2" *ngIf="activeStreamChannel.type === 'ip-camera'"></canvas>
-                </ng-container>
+                <div id="active-container" *ngIf="activeStreamChannel; else noTransmission">
+                </div>
                 <div class="toolbar" *ngIf="activeStreamChannel">
                     <button (click)="streamToTwitch()" *ngIf="!isLiveSteaming">Stream to Twitch</button>
                     <button (click)="stopTwitchStream()" *ngIf="isLiveSteaming">Stop live streaming</button>
@@ -23,13 +25,9 @@
     <div class="right"></div>
 </div>
 
-<div class="background">
-    <ng-container *ngIf="activeStreamChannel; else noTransmission">
-        <!--        <ng-container [ngSwitch]="activeStreamChannel.type">-->
-        <!--            <webcam *ngSwitchCase="'webcam'" [allowCameraSwitch]="false"></webcam>-->
-        <!--            <img *ngSwitchCase="'ip-camera'" [src]="activeStreamChannel.url">-->
-        <!--        </ng-container>-->
-    </ng-container>
+<div class="background-image" [ngClass]="{'animating': animatingBackground}">
+    <img class="future" [src]="currentBackground ? currentBackground : 'assets/images/background.jpg'">
+    <img class="previous" *ngIf="previousBackground" [src]="previousBackground">
 </div>
 
 

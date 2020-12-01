@@ -3,6 +3,11 @@
 
 /** Ionic CSS Variables **/
 :root {
+
+
+  --transtion-function: cubic-bezier(0.25, 1, 0.5, 1);
+  --transition: all .6s var(--transtion-function);
+
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;

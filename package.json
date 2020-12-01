@@ -29,6 +29,7 @@
     "html2canvas": "^1.0.0-rc.7",
     "jsmpeg": "^1.0.0",
     "jsmpeg-player": "^3.0.3",
+    "ng-cast": "0.0.2",
     "ngx-webcam": "^0.3.2",
     "onvif-rx": "^8.0.0",
     "onvif-rx-angular": "0.0.2",

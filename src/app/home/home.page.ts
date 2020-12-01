@@ -1,12 +1,10 @@
-import { AfterViewInit, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
-import { ONVIFService } from 'onvif-rx-angular';
-import { IManagedDevice, StreamType, TransportProtocol } from 'onvif-rx';
-import JSMpeg from 'jsmpeg-player';
+import { AfterViewInit, Component, HostListener, OnDestroy, ViewEncapsulation } from '@angular/core';
+import JSMpeg from '@cycjimmy/jsmpeg-player';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-export type StreamChannelType = 'webcam' | 'ip-camera';
+export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share';
 
 export interface StreamChannel {
   id: string;
@@ -28,8 +26,11 @@ export class HomePage implements AfterViewInit, OnDestroy {
   public channels: StreamChannel[] = [];
   public activeStreamChannel: StreamChannel;
   private rtcpPeerConnection: RTCPeerConnection;
-  private isLiveSteaming: boolean = false;
+  private isLiveSteaming = false;
   private destroyer: Subject<void>;
+  public previousBackground: string;
+  public currentBackground: string;
+  public animatingBackground: boolean = false;
 
   constructor(private http: HttpClient) {
 
@@ -37,21 +38,21 @@ export class HomePage implements AfterViewInit, OnDestroy {
       {
         id: 'webcam',
         name: 'Local Camera',
-        preview: '',
+        preview: 'assets/images/background1.jpeg',
         type: 'webcam'
       },
       {
         id: 'ipvideo',
         name: 'IP Camera',
-        preview: '',
+        preview: 'assets/images/background2.png',
         url: 'ws://localhost:9999',
         type: 'ip-camera'
       },
       {
-        id: 'webcam-2',
-        name: 'Local Camera',
-        preview: '',
-        type: 'webcam'
+        id: 'share-screen',
+        name: 'Screen share',
+        preview: 'assets/images/background3.jpeg',
+        type: 'screen-share'
       },
     ];
 
@@ -60,6 +61,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    this.previousBackground = 'assets/images/background.jpg';
   }
 
   private createRTCPConnection() {
@@ -75,87 +77,32 @@ export class HomePage implements AfterViewInit, OnDestroy {
   public onChannelChange(event: StreamChannel) {
     this.activeStreamChannel = event;
     setTimeout(() => {
+      document.getElementById('active-container').innerHTML = '';
+      const canvasMediaContainer: any = document.getElementById('active-container') as HTMLCanvasElement;
       switch (event.type) {
         case 'ip-camera':
-          const canvas: any = document.getElementById('video') as HTMLCanvasElement;
-          initIPCamera(event.url, canvas);
+          initIPCamera(event.url, canvasMediaContainer);
           break;
         case 'webcam':
-          const canvasMediaContainer: any = document.getElementById('media-container') as HTMLCanvasElement;
           appendWebcam(event.stream, canvasMediaContainer);
+          break;
+        case 'screen-share':
+          appendWebcam(event.stream, canvasMediaContainer);
+          // appendWebcam(event.stream, canvasMediaContainer);
           break;
       }
     }, 500);
+
+    this.currentBackground = this.activeStreamChannel.preview;
+    this.animateBackground();
+    setTimeout(() => {
+      this.previousBackground = this.activeStreamChannel.preview;
+    }, 2000);
   }
 
-  public stopStreaming(): void {
-    this.activeStreamChannel = null;
-  }
-
-
-  public streamTo() {
-    // const log = msg => {
-    //   document.getElementById('logs').innerHTML += msg + '<br>';
-    // };
-    // const displayVideo = video => {
-    //   const el = document.createElement('video');
-    //   el.srcObject = video;
-    //   el.autoplay = true;
-    //   el.muted = true;
-    //   el.width = 160;
-    //   el.height = 120;
-    //
-    //   document.getElementById('localVideos').appendChild(el);
-    //   return video;
-    // };
-
-
-    // navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    //   .then((stream: MediaStream) => {
-    //     stream.getTracks().forEach((track: MediaStreamTrack) => {
-    //       this.rtcpPeerConnection.addTrack(track, stream);
-    //     });
-    //
-    //     displayVideo(stream);
-    //     this.rtcpPeerConnection.createOffer().then(d => this.rtcpPeerConnection.setLocalDescription(d)).catch(log);
-    //   }).catch(log);
-
-    // this.rtcpPeerConnection.oniceconnectionstatechange = e => log(this.rtcpPeerConnection.iceConnectionState);
-    // this.rtcpPeerConnection.onicecandidate = event => {
-    //   if (event.candidate === null) {
-    // document.getElementById('localSessionDescription').value = btoa(JSON.stringify(pc.localDescription));
-    //   }
-    // };
-
-    const startSession = () => {
-      // let sd = document.getElementById('remoteSessionDescription').value;
-      // if (sd === '') {
-      //   return alert('Session Description must not be empty');
-      // }
-
-      // try {
-      //   pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(sd))));
-      // } catch (e) {
-      //   alert(e);
-      // }
-    };
-    //
-    // const addDisplayCapture = () => {
-    //   navigator.mediaDevices.getDisplayMedia().then(stream => {
-    //     document.getElementById('displayCapture').disabled = true;
-    //
-    //     stream.getTracks().forEach((track: MediaStreamTrack) => {
-    //       pc.addTrack(track, displayVideo(stream));
-    //     });
-    //
-    //     pc.createOffer().then(d => pc.setLocalDescription(d)).catch(log);
-    //   });
-    // };
-
-  }
 
   private getRemoteSessionDescription(localSessionDescription: string): Observable<string> {
-    const url: string = 'http://localhost:3000/keys';
+    const url = 'http://localhost:3000/keys';
     const body = {
       streamKey: localSessionDescription
     };
@@ -165,7 +112,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     );
   }
 
-  public streamToTwitch() {
+  public async streamToTwitch() {
     if (!this.activeStreamChannel?.stream) {
       console.error('No active stream');
       return;
@@ -178,6 +125,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
     const stream: MediaStream = this.activeStreamChannel.stream;
     stream.getTracks().forEach((track: MediaStreamTrack) => {
+      console.log('t', track);
       this.rtcpPeerConnection.addTrack(track, stream);
     });
     this.rtcpPeerConnection.createOffer().then(d => this.rtcpPeerConnection.setLocalDescription(d)).catch(log);
@@ -185,6 +133,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.rtcpPeerConnection.oniceconnectionstatechange = e => log(this.rtcpPeerConnection.iceConnectionState);
     this.rtcpPeerConnection.onicecandidate = event => {
       if (event.candidate === null) {
+        console.log('e', event);
         const localDescription: string = btoa(JSON.stringify(this.rtcpPeerConnection.localDescription));
         this.getRemoteSessionDescription(localDescription).subscribe((remoteSessionDescription) => {
           if (remoteSessionDescription === '') {
@@ -193,6 +142,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
           try {
             this.rtcpPeerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(remoteSessionDescription))));
+            console.log(remoteSessionDescription);
             this.isLiveSteaming = true;
           } catch (e) {
             alert(e);
@@ -207,10 +157,25 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.rtcpPeerConnection.close();
     this.isLiveSteaming = false;
     this.rtcpPeerConnection = null;
+    this.activeStreamChannel = null;
+
+    this.currentBackground = 'assets/images/background.jpg';
+    this.animateBackground();
+    setTimeout(() => {
+      this.previousBackground = this.activeStreamChannel.preview;
+    }, 2000);
+    document.getElementById('active-container').innerHTML = '';
   }
 
   ngOnDestroy(): void {
     this.destroyer.next();
+  }
+
+  private animateBackground(): void {
+    this.animatingBackground = true;
+    setTimeout(() => {
+      this.animatingBackground = false;
+    }, 2000);
   }
 
 }
@@ -220,13 +185,24 @@ export function log(message: string) {
 }
 
 export function initIPCamera(url: string, canvas: any): MediaStream {
-  new JSMpeg.Player(url, {
-    canvas
-  });
-  const stream = canvas.captureStream(30);
+  const element = new JSMpeg.VideoElement(canvas, url, {});
+  const stream = element.els.canvas.captureStream() as MediaStream;
 
-  return stream;
+  element.els.canvas.setAttribute('id', 'active-element');
+
+  const audioCtx = element.player.audio.destination.context;
+  const track = audioCtx.createMediaStreamDestination().stream.getAudioTracks()[0];
+
+  const video = document.createElement('video') as any;
+  video.srcObject = stream;
+
+  const videoStream = video.captureStream();
+
+  videoStream.addTrack(track);
+
+  return videoStream;
 }
+
 
 export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -239,7 +215,15 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
     });
 }
 
-export function appendWebcam(video: MediaStream, parent: HTMLElement) {
+
+export function initScreenShare(parentElement: HTMLElement): Promise<MediaStream> {
+  return (navigator.mediaDevices as any).getDisplayMedia().then(stream => {
+    appendWebcam(stream, parentElement);
+    return stream;
+  });
+}
+
+export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideoElement {
   const el = document.createElement('video');
   el.srcObject = video;
   el.autoplay = true;
@@ -247,6 +231,10 @@ export function appendWebcam(video: MediaStream, parent: HTMLElement) {
   el.width = 160;
   el.height = 120;
 
-  // parent.parentElement.replaceChild(parent, el);
   parent.prepend(el);
+
+  return el;
 }
+
+
+

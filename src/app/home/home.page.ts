@@ -3,6 +3,7 @@ import JSMpeg from '@cycjimmy/jsmpeg-player';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ElectronService } from 'ngx-electron';
 
 export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share';
 
@@ -30,9 +31,10 @@ export class HomePage implements AfterViewInit, OnDestroy {
   private destroyer: Subject<void>;
   public previousBackground: string;
   public currentBackground: string;
-  public animatingBackground: boolean = false;
+  public animatingBackground = false;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private electronService: ElectronService) {
 
     this.channels = [
       {
@@ -219,16 +221,34 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
 }
 
 
-export function initScreenShare(parentElement: HTMLElement): Promise<MediaStream> {
-  return (navigator.mediaDevices as any).getDisplayMedia({
-    audio: true,
-    video: true
-  }).then((stream: MediaStream) => {
-    appendWebcam(stream, parentElement);
-    console.log(stream.getTracks()[0].getConstraints());
-    console.log(stream.getTracks()[0].getCapabilities());
-    console.log(stream.getTracks()[0].getSettings());
-    return stream;
+export function initScreenShare(parentElement: HTMLElement, electronService: ElectronService): Promise<MediaStream> {
+  // return (navigator.mediaDevices as any).getDisplayMedia({
+  //   audio: true,
+  //   video: true
+  // }).then((stream: MediaStream) => {
+  //   appendWebcam(stream, parentElement);
+  //   console.log(stream.getTracks()[0].getConstraints());
+  //   console.log(stream.getTracks()[0].getCapabilities());
+  //   console.log(stream.getTracks()[0].getSettings());
+  //   return stream;
+  // });
+
+  return electronService.desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
+    for (const source of sources) {
+      console.log(source);
+      if (source.name === 'Electron') {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: true
+          });
+          return stream;
+        } catch (e) {
+          console.error(e);
+        }
+        return null;
+      }
+    }
   });
 }
 

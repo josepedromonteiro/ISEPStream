@@ -37,7 +37,7 @@ function createWindow () {
   );
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools({mode:'undocked'})
+  mainWindow.webContents.openDevTools(/**{mode:'undocked'}*/)
 
   mainWindow.on('closed', function () {
     mainWindow = null
@@ -73,7 +73,7 @@ app.on('ready', () => {
 
 
     setTimeout(()=>{
-      splash.destroy();
+      // splash.destroy();
       mainWindow.show();
     }, 7000)
   });

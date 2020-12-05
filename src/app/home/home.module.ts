@@ -6,6 +6,7 @@ import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
 import { CardVideoComponent } from '../card-video/card-video.component';
+import { SharedModule } from '../../shared.module';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { CardVideoComponent } from '../card-video/card-video.component';
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule
+    HomePageRoutingModule,
+    SharedModule
   ],
   declarations: [HomePage, CardVideoComponent]
 })

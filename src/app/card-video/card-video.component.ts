@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { appendWebcam, initIPCamera, initScreenShare, initWebcam, StreamChannel } from '../home/home.page';
+import { ElectronService } from 'ngx-electron';
 
 @Component({
   selector: 'app-card-video',
@@ -14,7 +15,7 @@ export class CardVideoComponent implements OnInit, AfterViewInit {
   public isScreenShare = false;
   public isSharing = false;
 
-  constructor() {
+  constructor(private electronService: ElectronService) {
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -42,7 +43,7 @@ export class CardVideoComponent implements OnInit, AfterViewInit {
   public async startSharing(): Promise<void> {
     const canvas: any = document.getElementById('media-container-' + this.streamChannel.id) as HTMLCanvasElement;
     try {
-      this.streamChannel.stream = await initScreenShare(canvas);
+      this.streamChannel.stream = await initScreenShare(canvas, this.electronService);
       this.isSharing = true;
     } catch (e) {
       console.warn(e);

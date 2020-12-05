@@ -5,9 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
-import { WebcamModule } from 'ngx-webcam';
 import { CardVideoComponent } from '../card-video/card-video.component';
-import { ONVIFModule } from 'onvif-rx-angular';
 
 
 @NgModule({
@@ -15,9 +13,7 @@ import { ONVIFModule } from 'onvif-rx-angular';
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule,
-    WebcamModule,
-    ONVIFModule
+    HomePageRoutingModule
   ],
   declarations: [HomePage, CardVideoComponent]
 })

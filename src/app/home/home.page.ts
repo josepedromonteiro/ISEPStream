@@ -125,9 +125,9 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
     const stream: MediaStream = this.activeStreamChannel.stream;
     stream.getTracks().forEach((track: MediaStreamTrack) => {
-      console.log('t', track);
       this.rtcpPeerConnection.addTrack(track, stream);
     });
+
     this.rtcpPeerConnection.createOffer().then(d => this.rtcpPeerConnection.setLocalDescription(d)).catch(log);
 
     this.rtcpPeerConnection.oniceconnectionstatechange = e => log(this.rtcpPeerConnection.iceConnectionState);
@@ -190,17 +190,17 @@ export function initIPCamera(url: string, canvas: any): MediaStream {
 
   element.els.canvas.setAttribute('id', 'active-element');
 
-  const audioCtx = element.player.audio.destination.context;
-  const track = audioCtx.createMediaStreamDestination().stream.getAudioTracks()[0];
+  // const audioCtx = element.player.audio.destination.context;
+  // const track = audioCtx.createMediaStreamDestination().stream.getAudioTracks()[0];
+  //
+  // const video = document.createElement('video') as any;
+  // video.srcObject = stream;
+  //
+  // const videoStream = video.captureStream();
+  //
+  // videoStream.addTrack(track);
 
-  const video = document.createElement('video') as any;
-  video.srcObject = stream;
-
-  const videoStream = video.captureStream();
-
-  videoStream.addTrack(track);
-
-  return videoStream;
+  return stream;
 }
 
 
@@ -208,6 +208,9 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream: MediaStream) => {
       appendWebcam(stream, parentElement);
+      console.log(stream.getTracks()[1].getConstraints());
+      console.log(stream.getTracks()[1].getCapabilities());
+      console.log(stream.getTracks()[1].getSettings());
       return stream;
     }).catch((err) => {
       console.error(err);
@@ -217,8 +220,14 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
 
 
 export function initScreenShare(parentElement: HTMLElement): Promise<MediaStream> {
-  return (navigator.mediaDevices as any).getDisplayMedia().then(stream => {
+  return (navigator.mediaDevices as any).getDisplayMedia({
+    audio: true,
+    video: true
+  }).then((stream: MediaStream) => {
     appendWebcam(stream, parentElement);
+    console.log(stream.getTracks()[0].getConstraints());
+    console.log(stream.getTracks()[0].getCapabilities());
+    console.log(stream.getTracks()[0].getSettings());
     return stream;
   });
 }

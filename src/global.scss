@@ -25,12 +25,25 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@100;400;600;800&display=swap');
 
 
-*{
+* {
   font-family: 'Barlow', sans-serif;
 }
 
+
+.new-modal {
+  --backdrop-opacity: .7 !important;
+
+  .modal-wrapper {
+    position: fixed;
+    bottom: 0;
+    height: 350px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    width: 800px;
+    background-color: rgb(41,41,41, .9);
+  }
+}
 

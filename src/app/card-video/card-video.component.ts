@@ -1,6 +1,9 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { appendWebcam, initIPCamera, initScreenShare, initWebcam, StreamChannel } from '../home/home.page';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { initIPCamera, initWebcam, StreamChannel } from '../home/home.page';
 import { ElectronService } from 'ngx-electron';
+import { ScreenShareService, Stream } from '../services/screen-share/screen-share.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-card-video',
@@ -8,15 +11,18 @@ import { ElectronService } from 'ngx-electron';
   styleUrls: ['./card-video.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CardVideoComponent implements OnInit, AfterViewInit {
+export class CardVideoComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Output() sendToStream: EventEmitter<StreamChannel> = new EventEmitter<StreamChannel>();
   @Input() streamChannel: StreamChannel;
   public isScreenShare = false;
   public isSharing = false;
+  private destroyer: Subject<void> = new Subject<void>();
 
-  constructor(private electronService: ElectronService) {
+  constructor(private electronService: ElectronService,
+              private screenShareService: ScreenShareService) {
   }
+
 
   async ngAfterViewInit(): Promise<void> {
 
@@ -43,11 +49,22 @@ export class CardVideoComponent implements OnInit, AfterViewInit {
   public async startSharing(): Promise<void> {
     const canvas: any = document.getElementById('media-container-' + this.streamChannel.id) as HTMLCanvasElement;
     try {
-      this.streamChannel.stream = await initScreenShare(canvas, this.electronService);
-      this.isSharing = true;
+      await this.screenShareService.initScreenShare(this.streamChannel.id, canvas);
+      this.screenShareService.onStreamActive
+        .pipe(takeUntil(this.destroyer))
+        .subscribe((stream: Stream) => {
+          if (this.streamChannel.id === stream.id) {
+            this.streamChannel.stream = stream.stream;
+            this.isSharing = true;
+          }
+        });
     } catch (e) {
       console.warn(e);
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.destroyer.complete();
   }
 
 }

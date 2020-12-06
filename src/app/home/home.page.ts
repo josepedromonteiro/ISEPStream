@@ -1,10 +1,9 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import JSMpeg from '@cycjimmy/jsmpeg-player';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { ElectronService } from 'ngx-electron';
+import { Subject } from 'rxjs';
 
+
+declare var WindowPeerConnection;
 export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share';
 
 export interface StreamChannel {
@@ -16,6 +15,7 @@ export interface StreamChannel {
   stream?: MediaStream;
 }
 
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -26,15 +26,16 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   public channels: StreamChannel[] = [];
   public activeStreamChannel: StreamChannel;
-  private rtcpPeerConnection: RTCPeerConnection;
+  // private rtcpPeerConnection: RTCPeerConnection;
   private isLiveSteaming = false;
   private destroyer: Subject<void>;
+  private mainWindow: typeof WindowPeerConnection;
+  private secondWindow: typeof WindowPeerConnection;
   public previousBackground: string;
   public currentBackground: string;
   public animatingBackground = false;
 
-  constructor(private http: HttpClient,
-              private electronService: ElectronService) {
+  constructor() {
 
     this.channels = [
       {
@@ -60,21 +61,24 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
     // this.activeStreamChannel = this.channels[0];
     this.destroyer = new Subject();
+
+    this.mainWindow = new WindowPeerConnection('mainWindow');
+    this.secondWindow = new WindowPeerConnection('secondWindow');
   }
 
   ngAfterViewInit(): void {
     this.previousBackground = 'assets/images/background.jpg';
   }
 
-  private createRTCPConnection() {
-    this.rtcpPeerConnection = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: 'stun:stun.l.google.com:19302'
-        }
-      ]
-    });
-  }
+  // private createRTCPConnection() {
+  //   this.rtcpPeerConnection = new RTCPeerConnection({
+  //     iceServers: [
+  //       {
+  //         urls: 'stun:stun.l.google.com:19302'
+  //       }
+  //     ]
+  //   });
+  // }
 
   public onChannelChange(event: StreamChannel) {
     this.activeStreamChannel = event;
@@ -90,8 +94,11 @@ export class HomePage implements AfterViewInit, OnDestroy {
           break;
         case 'screen-share':
           appendWebcam(event.stream, canvasMediaContainer);
-          // appendWebcam(event.stream, canvasMediaContainer);
           break;
+      }
+
+      if (this.isLiveSteaming) {
+        this.startLiveStream();
       }
     }, 500);
 
@@ -103,62 +110,61 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
 
-  private getRemoteSessionDescription(localSessionDescription: string): Observable<string> {
-    const url = 'http://localhost:3000/keys';
-    const body = {
-      streamKey: localSessionDescription
-    };
+  // private getRemoteSessionDescription(localSessionDescription: string): Observable<string> {
+  //   const url = 'http://localhost:3000/keys';
+  //   const body = {
+  //     streamKey: localSessionDescription
+  //   };
+  //
+  //   return this.http.post<string>(url, body, { responseType: 'text' as 'json' }).pipe(
+  //     takeUntil(this.destroyer)
+  //   );
+  // }
 
-    return this.http.post<string>(url, body, { responseType: 'text' as 'json' }).pipe(
-      takeUntil(this.destroyer)
-    );
+  public async startLiveStream() {
+    // if (!this.activeStreamChannel?.stream) {
+    //   return;
+    // }
+    //
+    // if (!this.rtcpPeerConnection) {
+    //   this.createRTCPConnection();
+    // }
+    //
+    // const stream: MediaStream = this.activeStreamChannel.stream;
+    // stream.getTracks().forEach((track: MediaStreamTrack) => {
+    //   this.rtcpPeerConnection.addTrack(track, stream);
+    // });
+    //
+    // this.rtcpPeerConnection.createOffer().then(d => this.rtcpPeerConnection.setLocalDescription(d)).catch(log);
+    //
+    // this.rtcpPeerConnection.oniceconnectionstatechange = e => log(this.rtcpPeerConnection.iceConnectionState);
+    // this.rtcpPeerConnection.onicecandidate = event => {
+    //   if (event.candidate === null) {
+    //     const localDescription: string = btoa(JSON.stringify(this.rtcpPeerConnection.localDescription));
+    //     this.getRemoteSessionDescription(localDescription).subscribe((remoteSessionDescription) => {
+    //       if (remoteSessionDescription === '') {
+    //         return alert('Session Description must not be empty');
+    //       }
+    //
+    //       try {
+    //         this.rtcpPeerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(remoteSessionDescription))));
+    //         this.isLiveSteaming = true;
+    //       } catch (e) {
+    //         alert(e);
+    //       }
+    //     });
+    //
+    //   }
+    // };
+    console.log('sending stream');
+    await this.secondWindow.removeStream();
+    await this.mainWindow.removeStream();
+    this.mainWindow.attachStream(this.activeStreamChannel.stream);
+    this.mainWindow.sendStream('secondWindow');
   }
 
-  public async streamToTwitch() {
-    if (!this.activeStreamChannel?.stream) {
-      console.error('No active stream');
-      return;
-    }
-
-    if (!this.rtcpPeerConnection) {
-      console.error('No active rtcp');
-      this.createRTCPConnection();
-    }
-
-    const stream: MediaStream = this.activeStreamChannel.stream;
-    stream.getTracks().forEach((track: MediaStreamTrack) => {
-      this.rtcpPeerConnection.addTrack(track, stream);
-    });
-
-    this.rtcpPeerConnection.createOffer().then(d => this.rtcpPeerConnection.setLocalDescription(d)).catch(log);
-
-    this.rtcpPeerConnection.oniceconnectionstatechange = e => log(this.rtcpPeerConnection.iceConnectionState);
-    this.rtcpPeerConnection.onicecandidate = event => {
-      if (event.candidate === null) {
-        console.log('e', event);
-        const localDescription: string = btoa(JSON.stringify(this.rtcpPeerConnection.localDescription));
-        this.getRemoteSessionDescription(localDescription).subscribe((remoteSessionDescription) => {
-          if (remoteSessionDescription === '') {
-            return alert('Session Description must not be empty');
-          }
-
-          try {
-            this.rtcpPeerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(remoteSessionDescription))));
-            console.log(remoteSessionDescription);
-            this.isLiveSteaming = true;
-          } catch (e) {
-            alert(e);
-          }
-        });
-
-      }
-    };
-  }
-
-  public stopTwitchStream(): void {
-    this.rtcpPeerConnection.close();
+  public stopLiveStream(): void {
     this.isLiveSteaming = false;
-    this.rtcpPeerConnection = null;
     this.activeStreamChannel = null;
 
     this.currentBackground = 'assets/images/background.jpg';
@@ -167,6 +173,10 @@ export class HomePage implements AfterViewInit, OnDestroy {
       this.previousBackground = this.activeStreamChannel.preview;
     }, 2000);
     document.getElementById('active-container').innerHTML = '';
+
+
+    const mainWindow = new WindowPeerConnection('mainWindow');
+    mainWindow.removeStream();
   }
 
   ngOnDestroy(): void {
@@ -192,16 +202,6 @@ export function initIPCamera(url: string, canvas: any): MediaStream {
 
   element.els.canvas.setAttribute('id', 'active-element');
 
-  // const audioCtx = element.player.audio.destination.context;
-  // const track = audioCtx.createMediaStreamDestination().stream.getAudioTracks()[0];
-  //
-  // const video = document.createElement('video') as any;
-  // video.srcObject = stream;
-  //
-  // const videoStream = video.captureStream();
-  //
-  // videoStream.addTrack(track);
-
   return stream;
 }
 
@@ -210,46 +210,11 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream: MediaStream) => {
       appendWebcam(stream, parentElement);
-      console.log(stream.getTracks()[1].getConstraints());
-      console.log(stream.getTracks()[1].getCapabilities());
-      console.log(stream.getTracks()[1].getSettings());
       return stream;
     }).catch((err) => {
       console.error(err);
       return null;
     });
-}
-
-
-export function initScreenShare(parentElement: HTMLElement, electronService: ElectronService): Promise<MediaStream> {
-  // return (navigator.mediaDevices as any).getDisplayMedia({
-  //   audio: true,
-  //   video: true
-  // }).then((stream: MediaStream) => {
-  //   appendWebcam(stream, parentElement);
-  //   console.log(stream.getTracks()[0].getConstraints());
-  //   console.log(stream.getTracks()[0].getCapabilities());
-  //   console.log(stream.getTracks()[0].getSettings());
-  //   return stream;
-  // });
-
-  return electronService.desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-    for (const source of sources) {
-      console.log(source);
-      if (source.name === 'Electron') {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: true
-          });
-          return stream;
-        } catch (e) {
-          console.error(e);
-        }
-        return null;
-      }
-    }
-  });
 }
 
 export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideoElement {

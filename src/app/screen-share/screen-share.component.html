@@ -1,0 +1,14 @@
+<div class="toolbar">
+    <ion-button shape="round" fill="clear"  (click)="screenShareService.closeModal()">
+        <ion-icon  slot="icon-only" name="close-circle"></ion-icon>
+    </ion-button>
+</div>
+<span class="title">
+   Share screen
+</span>
+<span class="subtitle">Click the card you want to share</span>
+<div class="container">
+    <div [attr.id]="'container-'+source.id" class="source-container" *ngFor="let source of sources" (click)="onSelectSource(source)">
+        <span class="source-title">{{source.name}}</span>
+    </div>
+</div>

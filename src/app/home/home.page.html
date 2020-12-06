@@ -11,8 +11,8 @@
                 <div id="active-container" *ngIf="activeStreamChannel; else noTransmission">
                 </div>
                 <div class="toolbar" *ngIf="activeStreamChannel">
-                    <button (click)="streamToTwitch()" *ngIf="!isLiveSteaming">Stream to Twitch</button>
-                    <button (click)="stopTwitchStream()" *ngIf="isLiveSteaming">Stop live streaming</button>
+                    <button (click)="startLiveStream()" *ngIf="!isLiveSteaming">Live stream</button>
+                    <button (click)="stopLiveStream()" *ngIf="isLiveSteaming">Stop live streaming</button>
                 </div>
             </div>
         </div>

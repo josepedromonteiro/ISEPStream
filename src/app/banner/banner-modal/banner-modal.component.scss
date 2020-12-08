@@ -1,0 +1,39 @@
+app-banner-modal {
+  .toolbar {
+    position: sticky;
+    bottom: 0;
+    justify-content: flex-end;
+    align-items: center;
+    display: flex;
+
+    ion-button {
+      --padding-start: 0;
+      --padding-end: 8px;
+    }
+
+    ion-icon {
+      color: white;
+    }
+  }
+
+  .title-modal {
+    font-weight: bolder;
+    font-size: 30px;
+    color: white;
+    padding: 16px;
+    margin-top: -30px;
+  }
+
+  .banner-container {
+    padding: 30px;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+}

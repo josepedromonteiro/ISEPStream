@@ -5,6 +5,7 @@ import { ScreenShareComponent, Source } from '../../screen-share/screen-share.co
 import { DesktopCapturerSource } from 'electron';
 import { appendWebcam } from '../../home/home.page';
 import { Subject } from 'rxjs';
+import { iosEnterAnimation, iosLeaveAnimation } from '../../screen-share/screen-share.animations';
 
 export interface Stream {
   id: string;
@@ -35,24 +36,6 @@ export class ScreenShareService {
 
   public async onSelectSource(id: string, source: Source) {
     try {
-      // await (navigator as any).getUserMedia(
-      //   {
-      //     audio: false,
-      //     video: {
-      //       mandatory: {
-      //         chromeMediaSource: 'desktop',
-      //         chromeMediaSourceId: source.id
-      //       }
-      //     }
-      //   }
-      //   , (stream) => {
-      //     appendWebcam(stream, this.parentElement);
-      //     this.onStreamActive.next({ id, stream });
-      //     this.closeModal();
-      //   },
-      //   (err) => {
-      //     console.error(err);
-      //   });
 
       const stream = await this.getSourceStream(source);
       appendWebcam(stream, this.parentElement);
@@ -92,6 +75,8 @@ export class ScreenShareService {
     this.modal = await this.modalController.create({
       component: ScreenShareComponent,
       cssClass: 'new-modal',
+      enterAnimation: iosEnterAnimation,
+      leaveAnimation: iosLeaveAnimation,
       componentProps: {
         sources,
         id

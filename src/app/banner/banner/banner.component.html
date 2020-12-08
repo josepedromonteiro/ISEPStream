@@ -1,0 +1,31 @@
+<div class="container" [ngClass]="classes" (mouseenter)="showOptions = true" (mouseleave)="showOptions = false"
+     *ngIf="mode === bMode.VIEW">
+    <div class="options" [ngClass]="{'show': showOptions}">
+        <ion-button color="dark" (click)="data.click.onHide()">
+            <ion-icon slot="start" name="chevron-down"></ion-icon>
+            Hide banner
+        </ion-button>
+        <ion-button color="dark" (click)="data.click.onRemove()">
+            <ion-icon slot="start" name="trash"></ion-icon>
+            Remove banner
+        </ion-button>
+        <ion-button color="dark" (click)="data.click.onChange()">
+            <ion-icon slot="start" name="create"></ion-icon>
+            Change banner
+        </ion-button>
+    </div>
+    <div class="title" [style]="{'background-color': data?.color || 'rgba(232,0,0,.5)'}">{{data?.title}}</div>
+    <div class="subtitle">{{data?.subtitle}}</div>
+</div>
+<div class="container compact edit" *ngIf="mode === bMode.EDIT">
+    <div class="title" [style]="{'background-color': data?.color || 'rgba(232,0,0,.5)'}">
+        <input placeholder="Type the title" [(ngModel)]="data.title" />
+        <div class="color" (click)="presentColorPicker($event)"
+             [style]="{'background-color': data?.color || 'rgba(232,0,0,.5)'}"></div>
+    </div>
+    <div class="subtitle">
+        <input placeholder="Type a description" [(ngModel)]="data.subtitle" /></div>
+</div>
+
+
+

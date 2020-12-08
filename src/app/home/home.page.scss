@@ -29,6 +29,7 @@ app-home {
     filter: blur(90px) saturate(180%);
     height: 100vh;
     width: 100vw;
+    transition: all 1.8s var(--transtion-function);
 
     &::before {
       content: "";
@@ -49,14 +50,14 @@ app-home {
       }
 
       .future {
-        transform: rotate(60deg) scale(2);
+        transform: rotate(-60deg) scale(2);
         opacity: 1;
         z-index: -2;
       }
     }
 
     .previous, .future {
-      transition: all 1.8s var(--transtion-function);
+      transition: all 1.2s var(--transtion-function);
       height: 100%;
       width: 100%;
       object-fit: cover;
@@ -68,35 +69,13 @@ app-home {
 
     .previous {
       transform: rotate(0);
+      opacity: 1;
     }
 
     .future {
       transform: rotate(0);
       opacity: 0;
     }
-
-
-    //@keyframes show-future {
-    //  50% {
-    //    transform: rotate(-50deg) scale(4);
-    //  }
-    //
-    //  100% {
-    //    transform: rotate(0) scale(1);
-    //    opacity: 1;
-    //  }
-    //}
-    //
-    //@keyframes show-previous {
-    //  50% {
-    //    transform: rotate(50deg) scale(4);
-    //  }
-    //
-    //  100% {
-    //    transform: rotate(0) scale(1);
-    //    opacity: 0;
-    //  }
-    //}
 
     webcam {
       height: 100vh;
@@ -165,6 +144,7 @@ app-home {
         width: 100%;
         margin: auto;
         border-radius: 30px;
+        background-color: rgba(0, 0, 0, 0.2);
 
         #active-container {
           height: 100%;
@@ -223,47 +203,123 @@ app-home {
   }
 
   .live:hover {
-    .toolbar {
-      min-height: 250px;
-      max-height: 250px;
+    .toolbar, .topbar {
+      max-height: 400px;
       padding: 20px;
       z-index: 100;
+    }
 
-      button {
-        opacity: 1;
-        transform: scale(1);
-      }
+
+    ion-button {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 
-  .live .toolbar {
-    transition: var(--transition);
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    padding: 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 1) 100%);
-    max-height: 0;
-    overflow: visible;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
 
-    button {
-      transition: var(--transition);
-      padding: 10px 20px;
-      background-color: rgba(255, 0, 0, 0.73);
-      font-weight: bolder;
-      text-align: center;
-      outline: none;
-      border: none;
-      font-size: 16px;
-      border-radius: 15px;
-      color: white;
+  .live {
+    ion-button {
+      //--transition: var(--transition-all) !important;
+      //opacity: 0;
+      //transform: scale(0.5);
+    }
 
-      opacity: 0;
-      transform: scale(0.5);
+    .logo-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 20px;
+      z-index: 9;
+
+      &:hover {
+        .options-logo {
+          opacity: 1;
+          pointer-events: all;
+        }
+      }
+
+      .options-logo {
+        position: absolute;
+        transition: var(--transition-all);
+        top: 0;
+        left: 0;
+        opacity: 0;
+        pointer-events: none;
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        height: 50px;
+        width: auto;
+        border-radius: 15px;
+        animation: animate-image 0.6s var(--transtion-function) forwards;
+        overflow: hidden;
+
+        img {
+          object-fit: contain;
+          height: 100%;
+        }
+
+        @keyframes animate-image {
+          from {
+            transform: scale(.5);
+            opacity: (0);
+          }
+
+          to {
+            transform: scale(1);
+            opacity: (1);
+          }
+        }
+      }
+
+
+    }
+
+    .topbar {
+      transition: var(--transition-all);
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      padding: 0;
+      background: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, .7) 100%);
+      max-height: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+    }
+
+    .toolbar {
+      transition: var(--transition-all);
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      padding: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, .7) 100%);
+      max-height: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
     }
   }
 
@@ -274,7 +330,29 @@ app-home {
     font-size: 30px;
     height: 100%;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 30px;
+  }
+
+
+  .banner-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    max-width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    transition: var(--transition-all);
+    transform: translateY(100%);
+    max-height: 0;
+    margin: auto;
+    left: 0;
+    right: 0;
+
+    &.show {
+      transform: translateY(0);
+      max-height: 400px;
+    }
   }
 }

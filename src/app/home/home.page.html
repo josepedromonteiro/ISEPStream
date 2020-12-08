@@ -8,11 +8,32 @@
                 Stage
             </div>
             <div id="media-container" class="media-container">
+                <div class="topbar" *ngIf="!overlayInfo?.logo">
+                    <ion-button color="dark" (click)="inputUploader.click()">Add logo</ion-button>
+                    <input hidden id="file-input" accept="image/*" #inputUploader type="file"
+                           (change)="handleFileInput($event.target.files)" [multiple]="false" />
+                </div>
+                <div class="logo-container" *ngIf="overlayInfo?.logo">
+                    <div class="image-container">
+                        <img [src]="overlayInfo.logo" />
+                        <div class="options-logo">
+                            <ion-button color="dark" slot="icon-only" fill="clear" (click)="removeLogo()">
+                                <ion-icon name="trash"></ion-icon>
+                            </ion-button>
+                        </div>
+                    </div>
+                </div>
                 <div id="active-container" *ngIf="activeStreamChannel; else noTransmission">
                 </div>
-                <div class="toolbar" *ngIf="activeStreamChannel">
-                    <button (click)="startLiveStream()" *ngIf="!isLiveSteaming">Live stream</button>
-                    <button (click)="stopLiveStream()" *ngIf="isLiveSteaming">Stop live streaming</button>
+                <div class="toolbar" *ngIf="!bannerData.title || (bannerData.title && !bannerData.show)">
+                    <ion-button color="dark" *ngIf="!bannerData.title" (click)="addBanner()">Add banner</ion-button>
+                    <ion-button color="dark" *ngIf="bannerData.title && !bannerData.show" (click)="showBanner()">Show
+                        banner
+                    </ion-button>
+                </div>
+
+                <div class="banner-container" [ngClass]="{'show': bannerData.show}">
+                    <app-banner [data]="bannerData"></app-banner>
                 </div>
             </div>
         </div>

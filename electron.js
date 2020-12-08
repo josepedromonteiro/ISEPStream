@@ -3,6 +3,7 @@ const url = require("url");
 const path = require("path");
 const p2pChannel = require('./scripts/window-rtc.js').main;
 
+const TIMEOUT = 1000;
 let mainWindow, secondWindow;
 
 
@@ -20,7 +21,10 @@ function createSecondWindow() {
             enableRemoteModule: true,
             experimentalFeatures: true
         }
-    })
+    });
+
+
+    global.secondWindow = secondWindow;
 
 
     secondWindow.setMenuBarVisibility(false);
@@ -36,7 +40,7 @@ function createSecondWindow() {
     );
 
     // Open the DevTools.
-    secondWindow.webContents.openDevTools({mode: 'undocked'})
+    // secondWindow.webContents.openDevTools({mode: 'undocked'})
 
     secondWindow.on('closed', function () {
         secondWindow = null
@@ -69,10 +73,11 @@ function createWindow() {
     );
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools({mode: 'undocked'})
+    // mainWindow.webContents.openDevTools({mode: 'undocked'})
 
     mainWindow.on('closed', function () {
-        mainWindow = null
+        mainWindow = null;
+        secondWindow.close();
     })
 }
 
@@ -112,7 +117,7 @@ app.on('ready', () => {
         setTimeout(() => {
             // splash.destroy();
             mainWindow.show();
-        }, 7000)
+        }, TIMEOUT + 500)
     });
 
     createSecondWindow();
@@ -127,7 +132,7 @@ app.on('ready', () => {
             p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
             secondWindow.setFullScreen(true);
             secondWindow.show();
-        }, 7000)
+        }, TIMEOUT)
     });
 });
 

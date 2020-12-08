@@ -32,7 +32,6 @@ export class ScreenShareComponent implements OnInit, AfterViewInit {
   }
 
   public handleSources(sources: DesktopCapturerSource[]) {
-    console.log(sources);
     this.sources = sources;
     sources.forEach(async (source: Source) => {
       const sourceContainer = document.getElementById('container-' + source.id);

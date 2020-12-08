@@ -1,6 +1,14 @@
 import { AfterViewInit, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import JSMpeg from '@cycjimmy/jsmpeg-player';
 import { Subject } from 'rxjs';
+import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
+import { BannerData } from '../banner/banner/banner.component';
+import { ScreenShareComponent } from '../screen-share/screen-share.component';
+import { iosEnterAnimation, iosLeaveAnimation } from '../screen-share/screen-share.animations';
+import { ModalController } from '@ionic/angular';
+import { BannerModalComponent } from '../banner/banner-modal/banner-modal.component';
+import { isEmpty } from 'rxjs/operators';
+import { ElectronService } from 'ngx-electron';
 
 
 declare var WindowPeerConnection;
@@ -13,6 +21,14 @@ export interface StreamChannel {
   url?: string;
   preview: string;
   stream?: MediaStream;
+}
+
+export interface OverlayInfo {
+  logo?: string;
+  banner?: {
+    title: string;
+    text: string;
+  };
 }
 
 
@@ -34,8 +50,18 @@ export class HomePage implements AfterViewInit, OnDestroy {
   public previousBackground: string;
   public currentBackground: string;
   public animatingBackground = false;
+  public overlayInfo: OverlayInfo = {};
+  public bannerData: BannerData;
+  private toBase64: (file) => Promise<string> = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
 
-  constructor() {
+  constructor(private streamingService: StreamingService,
+              private modalController: ModalController,
+              private electronService: ElectronService) {
 
     this.channels = [
       {
@@ -62,26 +88,40 @@ export class HomePage implements AfterViewInit, OnDestroy {
     // this.activeStreamChannel = this.channels[0];
     this.destroyer = new Subject();
 
-    this.mainWindow = new WindowPeerConnection('mainWindow');
-    this.secondWindow = new WindowPeerConnection('secondWindow');
+    try {
+      this.mainWindow = new WindowPeerConnection('mainWindow');
+      this.secondWindow = new WindowPeerConnection('secondWindow');
+    } catch (e) {
+      console.error(e);
+    }
+
+    this.bannerData = {
+      show: false,
+      click: {
+        onChange: () => {
+          this.addBanner();
+        },
+        onRemove: () => {
+          this.bannerData.show = false;
+          this.bannerData.title = undefined;
+          this.bannerData.subtitle = undefined;
+          this.bannerData.color = undefined;
+          this.sendDataViaIPC('banner', this.bannerData);
+        },
+        onHide: () => {
+          this.bannerData.show = false;
+          this.sendDataViaIPC('banner', this.bannerData);
+        }
+      }
+    };
   }
 
   ngAfterViewInit(): void {
     this.previousBackground = 'assets/images/background.jpg';
   }
 
-  // private createRTCPConnection() {
-  //   this.rtcpPeerConnection = new RTCPeerConnection({
-  //     iceServers: [
-  //       {
-  //         urls: 'stun:stun.l.google.com:19302'
-  //       }
-  //     ]
-  //   });
-  // }
-
   public onChannelChange(event: StreamChannel) {
-    this.activeStreamChannel = event;
+    this.activeStreamChannel = { ...event };
     setTimeout(() => {
       document.getElementById('active-container').innerHTML = '';
       const canvasMediaContainer: any = document.getElementById('active-container') as HTMLCanvasElement;
@@ -96,10 +136,8 @@ export class HomePage implements AfterViewInit, OnDestroy {
           appendWebcam(event.stream, canvasMediaContainer);
           break;
       }
-
-      if (this.isLiveSteaming) {
-        this.startLiveStream();
-      }
+      this.streamingService.onChangeStreamChanel.next(event);
+      this.startLiveStream();
     }, 500);
 
     this.currentBackground = this.activeStreamChannel.preview;
@@ -109,58 +147,12 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
   }
 
-
-  // private getRemoteSessionDescription(localSessionDescription: string): Observable<string> {
-  //   const url = 'http://localhost:3000/keys';
-  //   const body = {
-  //     streamKey: localSessionDescription
-  //   };
-  //
-  //   return this.http.post<string>(url, body, { responseType: 'text' as 'json' }).pipe(
-  //     takeUntil(this.destroyer)
-  //   );
-  // }
-
   public async startLiveStream() {
-    // if (!this.activeStreamChannel?.stream) {
-    //   return;
-    // }
-    //
-    // if (!this.rtcpPeerConnection) {
-    //   this.createRTCPConnection();
-    // }
-    //
-    // const stream: MediaStream = this.activeStreamChannel.stream;
-    // stream.getTracks().forEach((track: MediaStreamTrack) => {
-    //   this.rtcpPeerConnection.addTrack(track, stream);
-    // });
-    //
-    // this.rtcpPeerConnection.createOffer().then(d => this.rtcpPeerConnection.setLocalDescription(d)).catch(log);
-    //
-    // this.rtcpPeerConnection.oniceconnectionstatechange = e => log(this.rtcpPeerConnection.iceConnectionState);
-    // this.rtcpPeerConnection.onicecandidate = event => {
-    //   if (event.candidate === null) {
-    //     const localDescription: string = btoa(JSON.stringify(this.rtcpPeerConnection.localDescription));
-    //     this.getRemoteSessionDescription(localDescription).subscribe((remoteSessionDescription) => {
-    //       if (remoteSessionDescription === '') {
-    //         return alert('Session Description must not be empty');
-    //       }
-    //
-    //       try {
-    //         this.rtcpPeerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(remoteSessionDescription))));
-    //         this.isLiveSteaming = true;
-    //       } catch (e) {
-    //         alert(e);
-    //       }
-    //     });
-    //
-    //   }
-    // };
-    console.log('sending stream');
     await this.secondWindow.removeStream();
     await this.mainWindow.removeStream();
     this.mainWindow.attachStream(this.activeStreamChannel.stream);
     this.mainWindow.sendStream('secondWindow');
+    this.isLiveSteaming = true;
   }
 
   public stopLiveStream(): void {
@@ -173,10 +165,13 @@ export class HomePage implements AfterViewInit, OnDestroy {
       this.previousBackground = this.activeStreamChannel.preview;
     }, 2000);
     document.getElementById('active-container').innerHTML = '';
+    this.streamingService.onStopSharing.next(true);
 
 
     const mainWindow = new WindowPeerConnection('mainWindow');
+    const secondWindow = new WindowPeerConnection('secondWindow');
     mainWindow.removeStream();
+    secondWindow.removeStream();
   }
 
   ngOnDestroy(): void {
@@ -190,6 +185,55 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
   }
 
+  public async handleFileInput(files: File[]): Promise<void> {
+    const logo: string = await this.toBase64(files[0]);
+    this.overlayInfo.logo = logo;
+    this.sendDataViaIPC('logo', this.overlayInfo.logo);
+  }
+
+
+  public async addBanner(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: BannerModalComponent,
+      cssClass: 'new-modal',
+      enterAnimation: iosEnterAnimation,
+      leaveAnimation: iosLeaveAnimation,
+      componentProps: {
+        bannerData: this.bannerData
+      }
+    });
+    modal.present();
+    modal.onDidDismiss().then((data) => {
+      if (!data?.data) {
+        return;
+      }
+      this.bannerData = { ...this.bannerData, ...data.data };
+      this.bannerData.show = true;
+      this.sendDataViaIPC('banner', this.bannerData);
+    });
+  }
+
+  removeLogo() {
+    this.overlayInfo.logo = null;
+    this.sendDataViaIPC('logo', '' );
+  }
+
+  sendDataViaIPC(channel: string, data: string | BannerData) {
+    let d = data;
+    if ((data as BannerData).click) {
+      d = { ...data as BannerData, click: null };
+    }
+    this.electronService.ipcRenderer.sendTo(
+      this.electronService.remote.getGlobal('secondWindow').webContents.id,
+      channel,
+      d
+    );
+  }
+
+  public showBanner(): void {
+    this.bannerData.show = true;
+    this.sendDataViaIPC('banner', this.bannerData);
+  }
 }
 
 export function log(message: string) {
@@ -218,6 +262,12 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
 }
 
 export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideoElement {
+
+  const videoChildren = parent.getElementsByTagName('video');
+  Array.from(videoChildren).forEach((videoChild: HTMLVideoElement) => {
+    parent.removeChild(videoChild);
+  });
+
   const el = document.createElement('video');
   el.srcObject = video;
   el.autoplay = true;

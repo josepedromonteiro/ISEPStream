@@ -42,8 +42,16 @@
     height: 350px;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-    width: 800px;
-    background-color: rgb(41,41,41, .9);
+    min-width: 800px;
+    background-color: rgb(41, 41, 41, .9);
+  }
+}
+
+.white-popover {
+  --background: white !important;
+
+  .popover-arrow::after {
+    background-color: white !important;
   }
 }
 

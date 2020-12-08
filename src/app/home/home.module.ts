@@ -15,7 +15,7 @@ import { SharedModule } from '../../shared.module';
     FormsModule,
     IonicModule,
     HomePageRoutingModule,
-    SharedModule
+    SharedModule,
   ],
   declarations: [HomePage, CardVideoComponent]
 })

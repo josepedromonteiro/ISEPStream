@@ -3,7 +3,8 @@ import { initIPCamera, initWebcam, StreamChannel } from '../home/home.page';
 import { ElectronService } from 'ngx-electron';
 import { ScreenShareService, Stream } from '../services/screen-share/screen-share.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
+import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
 
 @Component({
   selector: 'app-card-video',
@@ -17,10 +18,12 @@ export class CardVideoComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() streamChannel: StreamChannel;
   public isScreenShare = false;
   public isSharing = false;
+  public inStage = false;
   private destroyer: Subject<void> = new Subject<void>();
 
   constructor(private electronService: ElectronService,
-              private screenShareService: ScreenShareService) {
+              private screenShareService: ScreenShareService,
+              private streamingService: StreamingService) {
   }
 
 
@@ -44,6 +47,21 @@ export class CardVideoComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.streamingService.onStopSharing.pipe(
+      takeUntil(this.destroyer)
+    ).subscribe((stoped: boolean) => {
+      if (stoped) {
+        this.inStage = false;
+      }
+    });
+
+    this.streamingService.onChangeStreamChanel.pipe(
+      takeUntil(this.destroyer)
+    ).subscribe((activeChannel: StreamChannel) => {
+      if (this.streamChannel.id !== activeChannel.id) {
+        this.inStage = false;
+      }
+    });
   }
 
   public async startSharing(): Promise<void> {
@@ -51,11 +69,15 @@ export class CardVideoComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       await this.screenShareService.initScreenShare(this.streamChannel.id, canvas);
       this.screenShareService.onStreamActive
-        .pipe(takeUntil(this.destroyer))
+        .pipe(take(1))
         .subscribe((stream: Stream) => {
           if (this.streamChannel.id === stream.id) {
             this.streamChannel.stream = stream.stream;
             this.isSharing = true;
+
+            if (this.inStage) {
+              this.sendElementToStream(this.streamChannel);
+            }
           }
         });
     } catch (e) {
@@ -65,6 +87,11 @@ export class CardVideoComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.destroyer.complete();
+  }
+
+  public sendElementToStream(streamChannel: StreamChannel): void {
+    this.sendToStream.emit(streamChannel);
+    this.inStage = true;
   }
 
 }

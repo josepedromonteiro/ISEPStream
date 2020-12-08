@@ -219,6 +219,23 @@ app-home {
   .right {
     flex-grow: 1;
     height: 100%;
+
+    button {
+      padding: 10px 20px;
+      margin-right: 20px;
+      background-color: rgba(40, 40, 40, 1);
+      font-weight: bolder;
+      text-align: center;
+      outline: none;
+      border: none;
+      font-size: 16px;
+      border-radius: 15px;
+      color: white;
+    }
+
+    div {
+      overflow-y: auto;
+    }
   }
 
   .live:hover {

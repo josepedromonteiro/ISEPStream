@@ -22,7 +22,16 @@
             </app-card-video>
         </div>
     </div>
-    <div class="right"></div>
+    <div class="right">
+        <button (click)="addPlaylist()">Add Playlist</button>
+        <div *ngFor="let playlist of playlists">
+            <h3>{{ playlist.name }}</h3>
+            <button (click)="removePlaylist(playlist)">Remove Playlist</button>
+            <ul *ngFor="let file of playlist.files">
+                <h6>{{ file.name }}</h6>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <div class="background-image" [ngClass]="{'animating': animatingBackground}">

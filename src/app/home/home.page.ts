@@ -4,6 +4,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ElectronService } from 'ngx-electron';
+import { Playlist } from './playlist';
 
 export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share';
 
@@ -33,8 +34,9 @@ export class HomePage implements AfterViewInit, OnDestroy {
   public currentBackground: string;
   public animatingBackground = false;
 
-  constructor(private http: HttpClient,
-              private electronService: ElectronService) {
+  private playlists: Playlist[] = [];
+
+  constructor(private http: HttpClient, private electronService: ElectronService) {
 
     this.channels = [
       {
@@ -180,6 +182,32 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
   }
 
+  addPlaylist = () => {
+    let directory = this.electronService.remote.dialog.showOpenDialogSync({ properties: ['openDirectory']});
+
+    if (directory && directory[0]) {
+      let playlistName: string;
+      
+      if (this.electronService.isWindows) {
+        let directorySplit = directory[0].split('\\');
+        playlistName = directorySplit[directorySplit.length - 1];
+      } else {
+        let directorySplit = directory[0].split('/');
+        playlistName = directorySplit[directorySplit.length - 1];
+      }
+
+      let playlist = new Playlist(playlistName, directory[0]);
+      playlist.readFolder();
+
+      this.playlists.push(playlist);
+    }
+  }
+
+  removePlaylist = (playlist: Playlist) => {
+    let index = this.playlists.indexOf(playlist);
+    
+    this.playlists.splice(index, 1);
+  }
 }
 
 export function log(message: string) {

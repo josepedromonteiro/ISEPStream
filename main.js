@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, TouchBar, nativeImage} = require('electron');
 const url = require("url");
 const path = require("path");
 const p2pChannel = require('./scripts/window-rtc.js').main;
@@ -18,8 +18,9 @@ function createSecondWindow() {
     secondWindow = new BrowserWindow({
         width: 1100,
         height: 800,
-        show: false,
+        // show: false,
         frame: false,
+        title: 'ISEP Stage',
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
@@ -54,13 +55,17 @@ function createSecondWindow() {
     secondWindow.once('ready-to-show', () => {
         setTimeout(() => {
             // splash.destroy();
-
             p2pChannel.initChannel();
             // windowA and windowB are previously initiated BrowserWindows
             p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
             p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
             secondWindow.setFullScreen(true);
-            secondWindow.show();
+            secondWindow.hide();
+
+            setTimeout(()=>{
+                mainWindow.show();
+                mainWindow.focus();
+            }, 1000);
         }, TIMEOUT);
     });
 }
@@ -78,7 +83,6 @@ function createWindow() {
         blurGnomeSigma: 100,
         blurCornerRadius: 30,
         vibrancy: "fullscreen-ui",
-        frame: false,
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
@@ -109,9 +113,37 @@ function createWindow() {
     mainWindow.once('ready-to-show', () => {
         setTimeout(() => {
             // splash.destroy();
-            mainWindow.show();
+            // mainWindow.show();
+            // mainWindow.focus();
         }, TIMEOUT + 500)
     });
+
+    setUpTouchBar(mainWindow);
+
+}
+
+function setUpTouchBar(win) {
+
+    const playIcon = nativeImage.createFromPath('./src/assets/native/play-circle.png').resize({ height: 25 });
+
+
+    const button = new TouchBar.TouchBarButton({
+        label: `GO LIVE`,
+        accessibilityLabel: 'Counter',
+        backgroundColor: '#a30000',
+        icon: playIcon,
+        iconPosition: 'left',
+        click: () => {
+            // update();
+        },
+
+    });
+    const touchBar = new TouchBar({
+        items: [button],
+    });
+
+
+    win.setTouchBar(touchBar);
 }
 
 // app.on('ready', createWindow)

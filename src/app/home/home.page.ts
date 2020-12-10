@@ -155,7 +155,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.isLiveSteaming = true;
   }
 
-  public stopLiveStream(): void {
+  public cleanStage(): void {
     this.isLiveSteaming = false;
     this.activeStreamChannel = null;
 
@@ -173,8 +173,6 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.mainWindow.attachStream(null);
     this.mainWindow.sendStream('secondWindow');
 
-    // /Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"
-    //https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
   }
 
   ngOnDestroy(): void {
@@ -236,6 +234,49 @@ export class HomePage implements AfterViewInit, OnDestroy {
   public showBanner(): void {
     this.bannerData.show = true;
     this.sendDataViaIPC('banner', this.bannerData);
+  }
+
+  onRemoveStream(remove: boolean) {
+    if (remove) {
+      this.cleanStage();
+    }
+  }
+
+  startOnlineStream() {
+    // /Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"
+    //https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
+
+    const { exec } = this.electronService.remote.require('child_process');
+    exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"', (error, stdout, stderr) => {
+      if (error) {
+        console.error(error);
+      }
+
+      if (stdout) {
+        console.log(stdout);
+      }
+
+      if (stderr) {
+        console.error(error);
+      }
+    });
+  }
+
+  startRecording() {
+    const { exec } = this.electronService.remote.require('child_process');
+    exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "Cena 2"', (error, stdout, stderr) => {
+      if (error) {
+        console.error(error);
+      }
+
+      if (stdout) {
+        console.log(stdout);
+      }
+
+      if (stderr) {
+        console.error(error);
+      }
+    });
   }
 }
 

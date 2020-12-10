@@ -6,6 +6,42 @@ app-home {
   display: flex;
   flex-direction: row;
 
+  .live-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+
+
+    ion-button {
+      margin-right: 20px;
+    }
+
+
+    .stage-title {
+      font-weight: bolder;
+      margin-top: 15px;
+      font-size: 25px;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      width: 100%;
+
+      .live-now {
+        opacity: .8;
+        text-transform: uppercase;
+        transform: scale(.7);
+        background-color: #b50000;
+        color: white;
+        border-radius: 10px;
+        padding: 5px 20px;
+        animation: livenow 1.2s var(--transtion-function) forwards;
+      }
+
+    }
+  }
 
   .live-info {
     border-radius: 3px;
@@ -13,16 +49,16 @@ app-home {
     font-size: 12px;
     font-weight: bold;
     padding: 3px 10px;
-    margin: -20px auto auto auto;
+    margin: 20px auto auto auto;
     width: fit-content;
     position: relative;
     color: white;
 
     .animative {
       height: 30px;
-      width: 50px;
-      background-color: rgba(163, 0, 0, 0.71);
-      animation: animate-live 1.2s var(--transtion-function) infinite alternate;
+      width: 80px;
+      background-color: rgba(163, 0, 0, 0.6);
+      animation: animate-live 1.2s var(--transition-function) infinite alternate;
       position: absolute;
       right: 0;
       left: -3px;
@@ -44,26 +80,6 @@ app-home {
     }
   }
 
-  .stage-title {
-    font-weight: bolder;
-    margin-bottom: 20px;
-    font-size: 30px;
-    text-align: start;
-    display: flex;
-    align-items: center;
-
-    .live-now {
-      opacity: .8;
-      text-transform: uppercase;
-      transform: scale(.7);
-      background-color: #b50000;
-      color: white;
-      border-radius: 10px;
-      padding: 5px 20px;
-      animation: livenow 1.2s var(--transtion-function) forwards;
-    }
-
-  }
 
   .video-2 {
     height: 100%;
@@ -151,9 +167,10 @@ app-home {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    height: 80px;
+    height: 50px;
     width: 100%;
-    padding: 20px;
+    padding: 10px 20px;
+    margin-top: 15px;
 
     .logo {
       opacity: 0.8;
@@ -177,7 +194,7 @@ app-home {
   }
 
   .left {
-    width: 70%;
+    width: 75%;
     overflow: visible;
     height: 100%;
     position: relative;
@@ -237,13 +254,24 @@ app-home {
       }
     }
 
+
+    .channel-title{
+      font-size: 20px;
+      margin-bottom: 5px;
+      margin-top: 10px;
+      width: 100%;
+      padding-left: 24px;
+    }
+
     .channels {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       overflow: scroll;
-      height: 30%;
-      min-height: 300px;
+
+
+      //height: 25%;
+      min-height: 275px;
 
 
       &::after {

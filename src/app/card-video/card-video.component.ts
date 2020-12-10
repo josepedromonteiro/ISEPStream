@@ -15,6 +15,7 @@ import { StreamingService } from '../stream-area/components/stream-area/streamin
 export class CardVideoComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Output() sendToStream: EventEmitter<StreamChannel> = new EventEmitter<StreamChannel>();
+  @Output() removeStream: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() streamChannel: StreamChannel;
   public isScreenShare = false;
   public isSharing = false;

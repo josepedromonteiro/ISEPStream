@@ -4,10 +4,6 @@
 <div class="content">
     <div class="left">
         <div class="live">
-            <div class="stage-title">
-                <ng-container *ngIf="!activeStreamChannel;else activeStage">Stage</ng-container>
-                <ng-template #activeStage> <span class="live-now">live now</span>{{activeStreamChannel.name}}</ng-template>
-            </div>
             <div id="media-container" class="media-container">
                 <div class="topbar" *ngIf="!overlayInfo?.logo">
                     <ion-button class="logo-btn" *ngIf="!overlayInfo?.logo" color="light"
@@ -33,7 +29,8 @@
                 <div class="toolbar" *ngIf="!bannerData.title || (bannerData.title && !bannerData.show)">
                     <ion-button color="light" *ngIf="!bannerData.title" (click)="addBanner()">
                         <ion-icon name="chatbox" slot="start"></ion-icon>
-                        Add banner</ion-button>
+                        Add banner
+                    </ion-button>
                     <ion-button color="light" *ngIf="bannerData.title && !bannerData.show" (click)="showBanner()">Show
                         banner
                     </ion-button>
@@ -43,13 +40,31 @@
                     <app-banner [data]="bannerData"></app-banner>
                 </div>
             </div>
+            <div class="live-header">
+                <div class="stage-title">
+                    <ng-container *ngIf="!activeStreamChannel;else activeStage">Stage</ng-container>
+                    <ng-template #activeStage>{{activeStreamChannel.name}}
+                    </ng-template>
+                </div>
+                <ion-button color="danger" (click)="startOnlineStream()">
+                    <ion-icon slot="start" name="radio"></ion-icon>
+                    Live stream
+                </ion-button>
+                <ion-button color="danger" (click)="startRecording()">
+                    <ion-icon name="radio-button-on" slot="start"></ion-icon>
+                    Record stream
+                </ion-button>
+            </div>
+        </div>
+        <div class="channel-title">
+            Sources
         </div>
         <div class="channels">
             <app-card-video *ngFor="let channel of channels" [streamChannel]="channel"
-                            (sendToStream)="onChannelChange($event)">
+                            (sendToStream)="onChannelChange($event)" (removeStream)="onRemoveStream($event)">
                 <div class="live-info" *ngIf="activeStreamChannel?.id === channel.id">
                     <div class="animative"></div>
-                    LIVE
+                    ON STAGE
                 </div>
             </app-card-video>
         </div>

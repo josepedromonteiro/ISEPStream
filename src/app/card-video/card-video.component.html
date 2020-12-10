@@ -9,11 +9,13 @@
     </div>
     <div class="toolbar">
         <ion-button color="danger" *ngIf="isScreenShare && !isSharing" (click)="startSharing()">
+            <ion-icon name="albums" slot="start"></ion-icon>
             Start screen share
         </ion-button>
-        <ion-button color="danger" (click)="stopLiveStream()" *ngIf="inStage">Remove stream
+        <ion-button color="danger" (click)="removeStream.emit(true)" *ngIf="inStage">Remove stream
         </ion-button>
         <ion-button color="danger" *ngIf="isSharing && !inStage" (click)="sendElementToStream(streamChannel)">
+            <ion-icon name="push" slot="start"></ion-icon>
             Send to stage
         </ion-button>
         <ion-button color="dark" *ngIf="isScreenShare && isSharing" (click)="startSharing()">Change Screen</ion-button>

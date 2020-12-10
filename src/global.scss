@@ -32,6 +32,10 @@ body, .ion-page, html {
   background-color: transparent;
 }
 
+.windows .ion-page {
+  background-color: rgba(var(--ion-color-light-rgb), .7) !important;
+}
+
 * {
   font-family: 'Barlow', sans-serif;
 }

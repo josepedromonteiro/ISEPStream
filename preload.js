@@ -2,6 +2,8 @@
 // It has the same sandbox as a Chrome extension.
 const path = require('path');
 const url = require('url');
+const customTitlebar = require('custom-electron-titlebar');
+let bt = null;
 
 // import browserEnv from 'browser-env';
 // browserEnv(['navigator']);
@@ -14,17 +16,11 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const customTitlebar = require('custom-electron-titlebar');
-    const bt = new customTitlebar.Titlebar({
+    bt = new customTitlebar.Titlebar({
         backgroundColor: window.matchMedia('(prefers-color-scheme:dark)').matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'),
     });
 
     bt.updateMenu(new Electron.Menu());
-
-    window.matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', event => {
-            bt.updateBackground(event.matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'));
-        })
 
 
     const replaceText = (selector, text) => {
@@ -35,4 +31,12 @@ window.addEventListener('DOMContentLoaded', () => {
     for (const type of ['chrome', 'node', 'electron']) {
         replaceText(`${type}-version`, process.versions[type])
     }
-})
+});
+
+
+window.matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', event => {
+        // alert('Change bitch');
+        bt.updateBackground(event.matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'));
+        console.log(bt);
+    });

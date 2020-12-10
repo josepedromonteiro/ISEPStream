@@ -7,11 +7,60 @@ app-home {
   flex-direction: row;
 
 
+  .live-info {
+    border-radius: 3px;
+    background-color: #a30000;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 10px;
+    margin: -20px auto auto auto;
+    width: fit-content;
+    position: relative;
+
+    .animative {
+      height: 30px;
+      width: 50px;
+      background-color: rgba(163, 0, 0, 0.71);
+      animation: animate-live 1.2s var(--transtion-function) infinite alternate;
+      position: absolute;
+      right: 0;
+      left: -3px;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      z-index: -1;
+      border-radius: 7px;
+    }
+
+    @keyframes animate-live {
+      from {
+        transform: scale(.5);
+      }
+
+      to {
+        transform: scale(1.1);
+      }
+    }
+  }
+
   .stage-title {
     font-weight: bolder;
     margin-bottom: 20px;
     font-size: 30px;
     text-align: start;
+    display: flex;
+    align-items: center;
+
+    .live-now {
+      opacity: .8;
+      text-transform: uppercase;
+      transform: scale(.7);
+      background-color: #b50000;
+      color: white;
+      border-radius: 10px;
+      padding: 5px 20px;
+      animation: livenow 1.2s var(--transtion-function) forwards;
+    }
 
   }
 
@@ -204,7 +253,8 @@ app-home {
 
   .live:hover {
     .toolbar, .topbar {
-      max-height: 400px;
+      max-height: 200px;
+      min-height: 200px;
       padding: 20px;
       z-index: 100;
     }
@@ -227,15 +277,14 @@ app-home {
     .logo-container {
       position: absolute;
       top: 0;
-      left: 0;
-      width: 100%;
+      right: 0;
       display: flex;
       justify-content: flex-end;
       align-items: center;
       padding: 20px;
-      z-index: 9;
+      z-index: 999;
 
-      &:hover {
+      .image-container:hover {
         .options-logo {
           opacity: 1;
           pointer-events: all;
@@ -301,10 +350,18 @@ app-home {
       padding: 0;
       background: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, .7) 100%);
       max-height: 0;
+      min-height: 0;
       overflow: hidden;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: flex-start;
+      text-align: end;
+      z-index: -1;
+
+      .logo-btn {
+        margin-left: auto;
+        margin-right: 0;
+      }
     }
 
     .toolbar {
@@ -316,6 +373,7 @@ app-home {
       padding: 0;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, .7) 100%);
       max-height: 0;
+      min-height: 0;
       overflow: hidden;
       display: flex;
       justify-content: center;

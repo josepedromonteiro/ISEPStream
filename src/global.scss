@@ -28,6 +28,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@100;400;600;800&display=swap');
 
 
+body, .ion-page, html {
+  background-color: transparent;
+}
+
 * {
   font-family: 'Barlow', sans-serif;
 }
@@ -43,7 +47,7 @@
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     min-width: 800px;
-    background-color: rgb(41, 41, 41, .9);
+    background-color: rgb(28, 28, 28);
   }
 }
 

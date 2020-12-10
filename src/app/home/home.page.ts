@@ -168,10 +168,13 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.streamingService.onStopSharing.next(true);
 
 
-    const mainWindow = new WindowPeerConnection('mainWindow');
-    const secondWindow = new WindowPeerConnection('secondWindow');
-    mainWindow.removeStream();
-    secondWindow.removeStream();
+    this.secondWindow.removeStream();
+    this.mainWindow.removeStream();
+    this.mainWindow.attachStream(null);
+    this.mainWindow.sendStream('secondWindow');
+
+    // /Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"
+    //https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
   }
 
   ngOnDestroy(): void {
@@ -215,7 +218,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   removeLogo() {
     this.overlayInfo.logo = null;
-    this.sendDataViaIPC('logo', '' );
+    this.sendDataViaIPC('logo', '');
   }
 
   sendDataViaIPC(channel: string, data: string | BannerData) {

@@ -1,10 +1,14 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow} = require('electron');
 const url = require("url");
 const path = require("path");
 const p2pChannel = require('./scripts/window-rtc.js').main;
+const os = require('os');
+const glasstron = require('glasstron');
 
 const TIMEOUT = 1000;
 let mainWindow, secondWindow;
+
+app.commandLine.appendSwitch("enable-transparent-visuals");
 
 
 // app.commandLine.appendSwitch('enable-transparent-visuals');
@@ -45,20 +49,42 @@ function createSecondWindow() {
     secondWindow.on('closed', function () {
         secondWindow = null
     });
+
+
+    secondWindow.once('ready-to-show', () => {
+        setTimeout(() => {
+            // splash.destroy();
+
+            p2pChannel.initChannel();
+            // windowA and windowB are previously initiated BrowserWindows
+            p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
+            p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
+            secondWindow.setFullScreen(true);
+            secondWindow.show();
+        }, TIMEOUT);
+    });
 }
 
 function createWindow() {
-    mainWindow = new BrowserWindow({
+    mainWindow = new glasstron.BrowserWindow({
         width: 1100,
         height: 800,
-        show: false,
+        show: true,
         titleBarStyle: 'hiddenInset',
+        transparent: true,
+        resizable: true,
+        title: "ISEP Stream",
+        blur: true,
+        blurType: "blurbehind",
+        blurGnomeSigma: 100,
+        blurCornerRadius: 20,
+        vibrancy: "ultra-dark",
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
             experimentalFeatures: true
         }
-    })
+    });
 
 
     mainWindow.setMenuBarVisibility(false);
@@ -78,7 +104,14 @@ function createWindow() {
     mainWindow.on('closed', function () {
         mainWindow = null;
         secondWindow.close();
-    })
+    });
+
+    mainWindow.once('ready-to-show', () => {
+        setTimeout(() => {
+            // splash.destroy();
+            mainWindow.show();
+        }, TIMEOUT + 500)
+    });
 }
 
 // app.on('ready', createWindow)
@@ -110,30 +143,17 @@ app.on('ready', () => {
     //     }),);
 
 
-
-
-    createWindow();
-    mainWindow.once('ready-to-show', () => {
-        setTimeout(() => {
-            // splash.destroy();
-            mainWindow.show();
-        }, TIMEOUT + 500)
-    });
+    setTimeout(
+        createWindow,
+        process.platform == "linux" ? 1000 : 0
+        // Electron has a bug on linux where it
+        // won't initialize properly when using
+        // transparency. To work around that, it
+        // is necessary to delay the window
+        // spawn function.
+    );
 
     createSecondWindow();
-
-    secondWindow.once('ready-to-show', () => {
-        setTimeout(() => {
-            // splash.destroy();
-
-            p2pChannel.initChannel();
-            // windowA and windowB are previously initiated BrowserWindows
-            p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
-            p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
-            secondWindow.setFullScreen(true);
-            secondWindow.show();
-        }, TIMEOUT)
-    });
 });
 
 

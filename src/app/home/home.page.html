@@ -5,11 +5,16 @@
     <div class="left">
         <div class="live">
             <div class="stage-title">
-                Stage
+                <ng-container *ngIf="!activeStreamChannel;else activeStage">Stage</ng-container>
+                <ng-template #activeStage> <span class="live-now">live now</span>{{activeStreamChannel.name}}</ng-template>
             </div>
             <div id="media-container" class="media-container">
                 <div class="topbar" *ngIf="!overlayInfo?.logo">
-                    <ion-button color="dark" (click)="inputUploader.click()">Add logo</ion-button>
+                    <ion-button class="logo-btn" *ngIf="!overlayInfo?.logo" color="dark"
+                                (click)="inputUploader.click()">
+                        <ion-icon name="image" slot="start"></ion-icon>
+                        Add logo
+                    </ion-button>
                     <input hidden id="file-input" accept="image/*" #inputUploader type="file"
                            (change)="handleFileInput($event.target.files)" [multiple]="false" />
                 </div>
@@ -26,7 +31,9 @@
                 <div id="active-container" *ngIf="activeStreamChannel; else noTransmission">
                 </div>
                 <div class="toolbar" *ngIf="!bannerData.title || (bannerData.title && !bannerData.show)">
-                    <ion-button color="dark" *ngIf="!bannerData.title" (click)="addBanner()">Add banner</ion-button>
+                    <ion-button color="dark" *ngIf="!bannerData.title" (click)="addBanner()">
+                        <ion-icon name="chatbox" slot="start"></ion-icon>
+                        Add banner</ion-button>
                     <ion-button color="dark" *ngIf="bannerData.title && !bannerData.show" (click)="showBanner()">Show
                         banner
                     </ion-button>
@@ -40,16 +47,20 @@
         <div class="channels">
             <app-card-video *ngFor="let channel of channels" [streamChannel]="channel"
                             (sendToStream)="onChannelChange($event)">
+                <div class="live-info" *ngIf="activeStreamChannel?.id === channel.id">
+                    <div class="animative"></div>
+                    LIVE
+                </div>
             </app-card-video>
         </div>
     </div>
     <div class="right"></div>
 </div>
 
-<div class="background-image" [ngClass]="{'animating': animatingBackground}">
-    <img class="future" [src]="currentBackground ? currentBackground : 'assets/images/background.jpg'">
-    <img class="previous" *ngIf="previousBackground" [src]="previousBackground">
-</div>
+<!--<div class="background-image" [ngClass]="{'animating': animatingBackground}">-->
+<!--    <img class="future" [src]="currentBackground ? currentBackground : 'assets/images/background.jpg'">-->
+<!--    <img class="previous" *ngIf="previousBackground" [src]="previousBackground">-->
+<!--</div>-->
 
 
 <ng-template #noTransmission>

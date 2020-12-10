@@ -1,5 +1,4 @@
 <div class="channel">
-
     <div class="topbar">
         <p>
             {{streamChannel.name}}
@@ -12,9 +11,12 @@
         <ion-button color="danger" *ngIf="isScreenShare && !isSharing" (click)="startSharing()">
             Start screen share
         </ion-button>
+        <ion-button color="danger" (click)="stopLiveStream()" *ngIf="inStage">Remove stream
+        </ion-button>
         <ion-button color="danger" *ngIf="isSharing && !inStage" (click)="sendElementToStream(streamChannel)">
             Send to stage
         </ion-button>
         <ion-button color="dark" *ngIf="isScreenShare && isSharing" (click)="startSharing()">Change Screen</ion-button>
     </div>
 </div>
+<ng-content></ng-content>

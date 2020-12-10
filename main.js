@@ -60,7 +60,7 @@ function createSecondWindow() {
             p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
             p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
             secondWindow.setFullScreen(true);
-            secondWindow.hide();
+            // secondWindow.hide();
 
             setTimeout(()=>{
                 mainWindow.show();
@@ -86,7 +86,8 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
-            experimentalFeatures: true
+            experimentalFeatures: true,
+            preload: path.join(__dirname, 'preload.js'),
         }
     });
 

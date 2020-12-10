@@ -10,7 +10,7 @@
             </div>
             <div id="media-container" class="media-container">
                 <div class="topbar" *ngIf="!overlayInfo?.logo">
-                    <ion-button class="logo-btn" *ngIf="!overlayInfo?.logo" color="dark"
+                    <ion-button class="logo-btn" *ngIf="!overlayInfo?.logo" color="light"
                                 (click)="inputUploader.click()">
                         <ion-icon name="image" slot="start"></ion-icon>
                         Add logo
@@ -22,7 +22,7 @@
                     <div class="image-container">
                         <img [src]="overlayInfo.logo" />
                         <div class="options-logo">
-                            <ion-button color="dark" slot="icon-only" fill="clear" (click)="removeLogo()">
+                            <ion-button color="light" slot="icon-only" fill="clear" (click)="removeLogo()">
                                 <ion-icon name="trash"></ion-icon>
                             </ion-button>
                         </div>
@@ -31,10 +31,10 @@
                 <div id="active-container" *ngIf="activeStreamChannel; else noTransmission">
                 </div>
                 <div class="toolbar" *ngIf="!bannerData.title || (bannerData.title && !bannerData.show)">
-                    <ion-button color="dark" *ngIf="!bannerData.title" (click)="addBanner()">
+                    <ion-button color="light" *ngIf="!bannerData.title" (click)="addBanner()">
                         <ion-icon name="chatbox" slot="start"></ion-icon>
                         Add banner</ion-button>
-                    <ion-button color="dark" *ngIf="bannerData.title && !bannerData.show" (click)="showBanner()">Show
+                    <ion-button color="light" *ngIf="bannerData.title && !bannerData.show" (click)="showBanner()">Show
                         banner
                     </ion-button>
                 </div>

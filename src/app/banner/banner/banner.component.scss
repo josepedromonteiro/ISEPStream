@@ -12,7 +12,7 @@ app-banner {
     justify-content: space-around;
     align-items: center;
     pointer-events: none;
-    background-color: rgba(0, 0, 0, 0.98);
+    background-color: rgba(var(--ion-color-light-rgb), 0.98);
     width: 100%;
     transform: translateY(var(--banner-height));
     opacity: 0;
@@ -38,7 +38,7 @@ app-banner {
     width: 100%;
     max-height: var(--banner-height);
     min-height: var(--banner-height);
-    background-color: rgba(30, 30, 30, 0.9);
+    background-color: rgba(var(--ion-color-light-rgb), 0.9);
     overflow: hidden;
     border-radius: 15px;
     box-shadow: 0 10px 60px 0 rgba(0, 0, 0, 0.4);
@@ -52,8 +52,17 @@ app-banner {
     }
 
     .title, .subtitle {
-      color: #e5e5e5;
+      color: var(--ion-color-dark);
       text-align: start;
+    }
+
+    .title{
+      color: white;
+
+      ::placeholder {
+        color: white;
+        opacity: .8;
+      }
     }
 
     .title {
@@ -119,7 +128,7 @@ app-banner {
     }
 
     &.edit {
-      background-color: rgba(0, 0, 0, 0.4);
+      background-color: rgba(var(--ion-color-light-rgb), 0.4);
 
       .title {
         display: flex;
@@ -141,5 +150,13 @@ app-banner {
         }
       }
     }
+  }
+}
+
+
+
+@media (prefers-color-scheme: dark) {
+  .container{
+    box-shadow: 0 10px 60px 0 rgba(0, 0, 0, 0.1);
   }
 }

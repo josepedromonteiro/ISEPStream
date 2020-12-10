@@ -1,15 +1,15 @@
 <div class="container" [ngClass]="classes" (mouseenter)="showOptions = true" (mouseleave)="showOptions = false"
      *ngIf="mode === bMode.VIEW">
     <div class="options" [ngClass]="{'show': showOptions}">
-        <ion-button color="dark" (click)="data.click.onHide()">
+        <ion-button color="light" (click)="data.click.onHide()">
             <ion-icon slot="start" name="chevron-down"></ion-icon>
             Hide banner
         </ion-button>
-        <ion-button color="dark" (click)="data.click.onRemove()">
+        <ion-button color="light" (click)="data.click.onRemove()">
             <ion-icon slot="start" name="trash"></ion-icon>
             Remove banner
         </ion-button>
-        <ion-button color="dark" (click)="data.click.onChange()">
+        <ion-button color="light" (click)="data.click.onChange()">
             <ion-icon slot="start" name="create"></ion-icon>
             Change banner
         </ion-button>

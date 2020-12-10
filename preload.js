@@ -15,15 +15,16 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     const customTitlebar = require('custom-electron-titlebar');
-    if (window.matchMedia('(prefers-color-scheme:dark)').matches) {
-        new customTitlebar.Titlebar({
-            backgroundColor: customTitlebar.Color.fromHex('#2b2b2b'),
-        });
-    } else {
-        new customTitlebar.Titlebar({
-            backgroundColor: customTitlebar.Color.fromHex('#ffffff'),
-        });
-    }
+    const bt = new customTitlebar.Titlebar({
+        backgroundColor: window.matchMedia('(prefers-color-scheme:dark)').matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'),
+    });
+
+    bt.updateMenu(new Electron.Menu());
+
+    window.matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', event => {
+            bt.updateBackground(event.matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'));
+        })
 
 
     const replaceText = (selector, text) => {

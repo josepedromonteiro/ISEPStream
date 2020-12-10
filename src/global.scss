@@ -63,3 +63,16 @@ body, .ion-page, html {
   }
 }
 
+
+body::-webkit-scrollbar {
+  width: 1em;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: rgba(var(--ion-color-light-rgb), .2);
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--ion-color-light-rgb), .8);
+  border-radius: 20px;
+}

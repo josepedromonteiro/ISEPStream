@@ -5,6 +5,7 @@ app-home {
   overflow: hidden;
   display: flex;
   flex-direction: row;
+  user-select: none;
 
   .live-header {
     display: flex;
@@ -267,7 +268,7 @@ app-home {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      overflow: scroll;
+      overflow: auto;
 
 
       //height: 25%;

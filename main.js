@@ -19,7 +19,7 @@ function createSecondWindow() {
         width: 1100,
         height: 800,
         // show: false,
-        frame: false,
+        frame: process.platform === 'win32',
         title: 'ISEP Stage',
         webPreferences: {
             nodeIntegration: true,

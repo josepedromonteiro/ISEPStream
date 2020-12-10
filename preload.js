@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
         backgroundColor: window.matchMedia('(prefers-color-scheme:dark)').matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'),
     });
 
-    bt.updateMenu(new Electron.Menu());
+    bt.updateMenu(null);
 
 
     const replaceText = (selector, text) => {

@@ -17,9 +17,11 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    changeWindow();
+
+    const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+    changeWindow(isDark);
     bt = new customTitlebar.Titlebar({
-        backgroundColor: window.matchMedia('(prefers-color-scheme:dark)').matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'),
+        backgroundColor: isDark ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'),
     });
 
     bt.updateMenu(null);
@@ -42,15 +44,15 @@ window.matchMedia('(prefers-color-scheme: dark)')
         // alert('Change bitch');
         bt.updateBackground(event.matches ? customTitlebar.Color.fromHex('#2b2b2b') : customTitlebar.Color.fromHex('#ffffff'));
         console.log(bt);
-        changeWindow();
+        changeWindow(event.matches);
     });
 
-function changeWindow() {
+function changeWindow(isDark) {
     if (process.platform !== 'win32') {
         return;
     }
     const op = {
-        theme: event.matches ? 'dark' : 'light',
+        theme: isDark ? 'dark' : 'light',
         effect: 'acrylic',
         useCustomWindowRefreshMethod: true,
         maximumRefreshRate: 60,

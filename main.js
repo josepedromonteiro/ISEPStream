@@ -1,4 +1,4 @@
-const {app, BrowserWindow, TouchBar, nativeImage} = require('electron');
+const {app, TouchBar, nativeImage} = require('electron');
 const url = require("url");
 const path = require("path");
 const p2pChannel = require('./scripts/window-rtc.js').main;
@@ -15,7 +15,7 @@ app.commandLine.appendSwitch("enable-transparent-visuals");
 // app.commandLine.appendSwitch('disable-gpu');
 
 function createSecondWindow() {
-    secondWindow = new BrowserWindow({
+    secondWindow = new glasstron.BrowserWindow({
         width: 1100,
         height: 800,
         // show: false,
@@ -62,7 +62,7 @@ function createSecondWindow() {
             secondWindow.setFullScreen(true);
             // secondWindow.hide();
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 mainWindow.show();
                 mainWindow.focus();
             }, 1000);
@@ -71,7 +71,8 @@ function createSecondWindow() {
 }
 
 function createWindow() {
-    mainWindow = new glasstron.BrowserWindow({
+
+    const config = {
         width: 1100,
         height: 800,
         show: true,
@@ -89,7 +90,22 @@ function createWindow() {
             experimentalFeatures: true,
             preload: path.join(__dirname, 'preload.js'),
         }
-    });
+    }
+
+    if(process.platform === "win32"){
+        const {BrowserWindow} = require("electron-acrylic-window");
+        const op = {
+            theme: 'appearance-based',
+            effect:  'acrylic',
+            useCustomWindowRefreshMethod:  true,
+            maximumRefreshRate: 60,
+            disableOnBlur:  true
+        }
+        mainWindow = new BrowserWindow(config);
+        mainWindow.setVibrancy(op);
+    }else{
+        mainWindow = new glasstron.BrowserWindow(config);
+    }
 
 
     mainWindow.setMenuBarVisibility(false);
@@ -125,7 +141,7 @@ function createWindow() {
 
 function setUpTouchBar(win) {
 
-    const playIcon = nativeImage.createFromPath('./src/assets/native/play-circle.png').resize({ height: 25 });
+    const playIcon = nativeImage.createFromPath('./src/assets/native/play-circle.png').resize({height: 25});
 
 
     const button = new TouchBar.TouchBarButton({

@@ -40,6 +40,7 @@
     "custom-electron-titlebar": "^3.2.5",
     "dom-to-image": "^2.6.0",
     "dom-to-image-more": "^2.8.0",
+    "electron-acrylic-window": "^0.5.4",
     "electron-peer-connection": "^1.0.6",
     "glasstron": "0.0.5",
     "html2canvas": "^1.0.0-rc.7",

@@ -19,9 +19,9 @@ export class AppComponent {
   ) {
     this.initializeApp();
 
-    if (this.electronService.isWindows) {
-      document.body.classList.add('windows');
-    }
+    // if (this.electronService.isWindows) {
+    //   document.body.classList.add('windows');
+    // }
   }
 
   initializeApp() {

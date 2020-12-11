@@ -59,8 +59,12 @@ function createSecondWindow() {
             // windowA and windowB are previously initiated BrowserWindows
             p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
             p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
-            secondWindow.setFullScreen(true);
-            // secondWindow.hide();
+            
+            if (process.platform === "win32") {
+                secondWindow.maximize();
+            } else {
+                secondWindow.setFullScreen(true);
+            }
 
             setTimeout(() => {
                 mainWindow.show();
@@ -76,7 +80,8 @@ function createWindow() {
         width: 1100,
         height: 800,
         show: true,
-        titleBarStyle: 'hiddenInset',
+        titleBarStyle: process.platform === "win32" ? 'hidden' : 'hiddenInset',
+        frame: process.platform !== "win32",
         resizable: true,
         title: "ISEP Stream",
         blur: true,

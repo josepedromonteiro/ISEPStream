@@ -59,7 +59,7 @@ function createSecondWindow() {
             // windowA and windowB are previously initiated BrowserWindows
             p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
             p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
-            
+
             if (process.platform === "win32") {
                 secondWindow.maximize();
             } else {
@@ -97,18 +97,18 @@ function createWindow() {
         }
     }
 
-    if(process.platform === "win32"){
+    if (process.platform === "win32") {
         const {BrowserWindow} = require("electron-acrylic-window");
         const op = {
-            theme: 'appearance-based',
-            effect:  'acrylic',
-            useCustomWindowRefreshMethod:  true,
+            theme: window.matchMedia('(prefers-color-scheme:dark)').matches  ? 'dark' : 'light',
+            effect: 'acrylic',
+            useCustomWindowRefreshMethod: true,
             maximumRefreshRate: 60,
-            disableOnBlur:  true
+            disableOnBlur: true
         }
         mainWindow = new BrowserWindow(config);
         mainWindow.setVibrancy(op);
-    }else{
+    } else {
         mainWindow = new glasstron.BrowserWindow(config);
     }
 
@@ -132,13 +132,13 @@ function createWindow() {
         secondWindow.close();
     });
 
-    mainWindow.once('ready-to-show', () => {
-        setTimeout(() => {
-            // splash.destroy();
-            // mainWindow.show();
-            // mainWindow.focus();
-        }, TIMEOUT + 500)
-    });
+    // mainWindow.once('ready-to-show', () => {
+    //     setTimeout(() => {
+    //         // splash.destroy();
+    //         // mainWindow.show();
+    //         // mainWindow.focus();
+    //     }, TIMEOUT + 500)
+    // });
 
     setUpTouchBar(mainWindow);
 
@@ -206,7 +206,6 @@ app.on('ready', () => {
         // is necessary to delay the window
         // spawn function.
     );
-
     createSecondWindow();
 });
 
@@ -216,3 +215,15 @@ if (setupEvents.handleSquirrelEvent()) {
     // squirrel event handled and app will exit in 1000ms, so don't do anything else
     return;
 }
+
+window.matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', event => {
+        const op = {
+            theme: event.matches ? 'dark' : 'light',
+            effect: 'acrylic',
+            useCustomWindowRefreshMethod: true,
+            maximumRefreshRate: 60,
+            disableOnBlur: true
+        }
+        mainWindow.setVibrancy(op);
+    });

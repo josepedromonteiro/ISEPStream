@@ -1,11 +1,16 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import JSMpeg from '@cycjimmy/jsmpeg-player';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
+import { BannerData } from '../banner/banner/banner.component';
+import { iosEnterAnimation, iosLeaveAnimation } from '../screen-share/screen-share.animations';
+import { ModalController } from '@ionic/angular';
+import { BannerModalComponent } from '../banner/banner-modal/banner-modal.component';
 import { ElectronService } from 'ngx-electron';
 import { Playlist } from './playlist';
 
+
+declare var WindowPeerConnection;
 export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share';
 
 export interface StreamChannel {
@@ -17,6 +22,15 @@ export interface StreamChannel {
   stream?: MediaStream;
 }
 
+export interface OverlayInfo {
+  logo?: string;
+  banner?: {
+    title: string;
+    text: string;
+  };
+}
+
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -27,16 +41,28 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   public channels: StreamChannel[] = [];
   public activeStreamChannel: StreamChannel;
-  private rtcpPeerConnection: RTCPeerConnection;
+  // private rtcpPeerConnection: RTCPeerConnection;
   private isLiveSteaming = false;
   private destroyer: Subject<void>;
+  private mainWindow: typeof WindowPeerConnection;
+  private secondWindow: typeof WindowPeerConnection;
   public previousBackground: string;
   public currentBackground: string;
   public animatingBackground = false;
+  public overlayInfo: OverlayInfo = {};
+  public bannerData: BannerData;
+  private toBase64: (file) => Promise<string> = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
 
   private playlists: Playlist[] = [];
-
-  constructor(private http: HttpClient, private electronService: ElectronService) {
+  
+  constructor(private streamingService: StreamingService,
+              private modalController: ModalController,
+              private electronService: ElectronService) {
 
     this.channels = [
       {
@@ -62,24 +88,41 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
     // this.activeStreamChannel = this.channels[0];
     this.destroyer = new Subject();
+
+    try {
+      this.mainWindow = new WindowPeerConnection('mainWindow');
+      this.secondWindow = new WindowPeerConnection('secondWindow');
+    } catch (e) {
+      console.error(e);
+    }
+
+    this.bannerData = {
+      show: false,
+      click: {
+        onChange: () => {
+          this.addBanner();
+        },
+        onRemove: () => {
+          this.bannerData.show = false;
+          this.bannerData.title = undefined;
+          this.bannerData.subtitle = undefined;
+          this.bannerData.color = undefined;
+          this.sendDataViaIPC('banner', this.bannerData);
+        },
+        onHide: () => {
+          this.bannerData.show = false;
+          this.sendDataViaIPC('banner', this.bannerData);
+        }
+      }
+    };
   }
 
   ngAfterViewInit(): void {
     this.previousBackground = 'assets/images/background.jpg';
   }
 
-  private createRTCPConnection() {
-    this.rtcpPeerConnection = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: 'stun:stun.l.google.com:19302'
-        }
-      ]
-    });
-  }
-
   public onChannelChange(event: StreamChannel) {
-    this.activeStreamChannel = event;
+    this.activeStreamChannel = { ...event };
     setTimeout(() => {
       document.getElementById('active-container').innerHTML = '';
       const canvasMediaContainer: any = document.getElementById('active-container') as HTMLCanvasElement;
@@ -92,9 +135,10 @@ export class HomePage implements AfterViewInit, OnDestroy {
           break;
         case 'screen-share':
           appendWebcam(event.stream, canvasMediaContainer);
-          // appendWebcam(event.stream, canvasMediaContainer);
           break;
       }
+      this.streamingService.onChangeStreamChanel.next(event);
+      this.startLiveStream();
     }, 500);
 
     this.currentBackground = this.activeStreamChannel.preview;
@@ -104,63 +148,16 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
   }
 
-
-  private getRemoteSessionDescription(localSessionDescription: string): Observable<string> {
-    const url = 'http://localhost:3000/keys';
-    const body = {
-      streamKey: localSessionDescription
-    };
-
-    return this.http.post<string>(url, body, { responseType: 'text' as 'json' }).pipe(
-      takeUntil(this.destroyer)
-    );
+  public async startLiveStream() {
+    await this.secondWindow.removeStream();
+    await this.mainWindow.removeStream();
+    this.mainWindow.attachStream(this.activeStreamChannel.stream);
+    this.mainWindow.sendStream('secondWindow');
+    this.isLiveSteaming = true;
   }
 
-  public async streamToTwitch() {
-    if (!this.activeStreamChannel?.stream) {
-      console.error('No active stream');
-      return;
-    }
-
-    if (!this.rtcpPeerConnection) {
-      console.error('No active rtcp');
-      this.createRTCPConnection();
-    }
-
-    const stream: MediaStream = this.activeStreamChannel.stream;
-    stream.getTracks().forEach((track: MediaStreamTrack) => {
-      this.rtcpPeerConnection.addTrack(track, stream);
-    });
-
-    this.rtcpPeerConnection.createOffer().then(d => this.rtcpPeerConnection.setLocalDescription(d)).catch(log);
-
-    this.rtcpPeerConnection.oniceconnectionstatechange = e => log(this.rtcpPeerConnection.iceConnectionState);
-    this.rtcpPeerConnection.onicecandidate = event => {
-      if (event.candidate === null) {
-        console.log('e', event);
-        const localDescription: string = btoa(JSON.stringify(this.rtcpPeerConnection.localDescription));
-        this.getRemoteSessionDescription(localDescription).subscribe((remoteSessionDescription) => {
-          if (remoteSessionDescription === '') {
-            return alert('Session Description must not be empty');
-          }
-
-          try {
-            this.rtcpPeerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(remoteSessionDescription))));
-            console.log(remoteSessionDescription);
-            this.isLiveSteaming = true;
-          } catch (e) {
-            alert(e);
-          }
-        });
-
-      }
-    };
-  }
-
-  public stopTwitchStream(): void {
-    this.rtcpPeerConnection.close();
+  public cleanStage(): void {
     this.isLiveSteaming = false;
-    this.rtcpPeerConnection = null;
     this.activeStreamChannel = null;
 
     this.currentBackground = 'assets/images/background.jpg';
@@ -169,6 +166,14 @@ export class HomePage implements AfterViewInit, OnDestroy {
       this.previousBackground = this.activeStreamChannel.preview;
     }, 2000);
     document.getElementById('active-container').innerHTML = '';
+    this.streamingService.onStopSharing.next(true);
+
+
+    this.secondWindow.removeStream();
+    this.mainWindow.removeStream();
+    this.mainWindow.attachStream(null);
+    this.mainWindow.sendStream('secondWindow');
+
   }
 
   ngOnDestroy(): void {
@@ -208,6 +213,134 @@ export class HomePage implements AfterViewInit, OnDestroy {
     
     this.playlists.splice(index, 1);
   }
+
+  public async handleFileInput(files: File[]): Promise<void> {
+    const logo: string = await this.toBase64(files[0]);
+    this.overlayInfo.logo = logo;
+    this.sendDataViaIPC('logo', this.overlayInfo.logo);
+  }
+
+  public async addBanner(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: BannerModalComponent,
+      cssClass: 'new-modal',
+      enterAnimation: iosEnterAnimation,
+      leaveAnimation: iosLeaveAnimation,
+      componentProps: {
+        bannerData: this.bannerData
+      }
+    });
+    modal.present();
+    modal.onDidDismiss().then((data) => {
+      if (!data?.data) {
+        return;
+      }
+      this.bannerData = { ...this.bannerData, ...data.data };
+      this.bannerData.show = true;
+      this.sendDataViaIPC('banner', this.bannerData);
+    });
+  }
+
+  removeLogo() {
+    this.overlayInfo.logo = null;
+    this.sendDataViaIPC('logo', '');
+  }
+
+  sendDataViaIPC(channel: string, data: string | BannerData) {
+    let d = data;
+    if ((data as BannerData).click) {
+      d = { ...data as BannerData, click: null };
+    }
+    this.electronService.ipcRenderer.sendTo(
+      this.electronService.remote.getGlobal('secondWindow').webContents.id,
+      channel,
+      d
+    );
+  }
+
+  public showBanner(): void {
+    this.bannerData.show = true;
+    this.sendDataViaIPC('banner', this.bannerData);
+  }
+
+  onRemoveStream(remove: boolean) {
+    if (remove) {
+      this.cleanStage();
+    }
+  }
+
+  startOnlineStream() {
+    // /Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"
+    //https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
+
+    const { exec } = this.electronService.remote.require('child_process');
+    if (this.electronService.isWindows) {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startstreaming --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else if(this.electronService.isMacOS) {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else {
+      // Linux
+    }
+  }
+
+  startRecording() {
+    const { exec } = this.electronService.remote.require('child_process');
+    if (this.electronService.isWindows) {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startrecording --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else if(this.electronService.isMacOS) {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else {
+      // Linux
+    }
+  }
 }
 
 export function log(message: string) {
@@ -220,16 +353,6 @@ export function initIPCamera(url: string, canvas: any): MediaStream {
 
   element.els.canvas.setAttribute('id', 'active-element');
 
-  // const audioCtx = element.player.audio.destination.context;
-  // const track = audioCtx.createMediaStreamDestination().stream.getAudioTracks()[0];
-  //
-  // const video = document.createElement('video') as any;
-  // video.srcObject = stream;
-  //
-  // const videoStream = video.captureStream();
-  //
-  // videoStream.addTrack(track);
-
   return stream;
 }
 
@@ -238,9 +361,6 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream: MediaStream) => {
       appendWebcam(stream, parentElement);
-      console.log(stream.getTracks()[1].getConstraints());
-      console.log(stream.getTracks()[1].getCapabilities());
-      console.log(stream.getTracks()[1].getSettings());
       return stream;
     }).catch((err) => {
       console.error(err);
@@ -248,39 +368,13 @@ export function initWebcam(parentElement: HTMLElement): Promise<MediaStream> {
     });
 }
 
-
-export function initScreenShare(parentElement: HTMLElement, electronService: ElectronService): Promise<MediaStream> {
-  // return (navigator.mediaDevices as any).getDisplayMedia({
-  //   audio: true,
-  //   video: true
-  // }).then((stream: MediaStream) => {
-  //   appendWebcam(stream, parentElement);
-  //   console.log(stream.getTracks()[0].getConstraints());
-  //   console.log(stream.getTracks()[0].getCapabilities());
-  //   console.log(stream.getTracks()[0].getSettings());
-  //   return stream;
-  // });
-
-  return electronService.desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-    for (const source of sources) {
-      console.log(source);
-      if (source.name === 'Electron') {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: true
-          });
-          return stream;
-        } catch (e) {
-          console.error(e);
-        }
-        return null;
-      }
-    }
-  });
-}
-
 export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideoElement {
+
+  const videoChildren = parent.getElementsByTagName('video');
+  Array.from(videoChildren).forEach((videoChild: HTMLVideoElement) => {
+    parent.removeChild(videoChild);
+  });
+
   const el = document.createElement('video');
   el.srcObject = video;
   el.autoplay = true;

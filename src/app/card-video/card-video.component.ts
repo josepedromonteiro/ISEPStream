@@ -1,6 +1,10 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { appendWebcam, initIPCamera, initScreenShare, initWebcam, StreamChannel } from '../home/home.page';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { initIPCamera, initWebcam, StreamChannel } from '../home/home.page';
 import { ElectronService } from 'ngx-electron';
+import { ScreenShareService, Stream } from '../services/screen-share/screen-share.service';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
 
 @Component({
   selector: 'app-card-video',
@@ -8,15 +12,21 @@ import { ElectronService } from 'ngx-electron';
   styleUrls: ['./card-video.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CardVideoComponent implements OnInit, AfterViewInit {
+export class CardVideoComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Output() sendToStream: EventEmitter<StreamChannel> = new EventEmitter<StreamChannel>();
+  @Output() removeStream: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() streamChannel: StreamChannel;
   public isScreenShare = false;
   public isSharing = false;
+  public inStage = false;
+  private destroyer: Subject<void> = new Subject<void>();
 
-  constructor(private electronService: ElectronService) {
+  constructor(private electronService: ElectronService,
+              private screenShareService: ScreenShareService,
+              private streamingService: StreamingService) {
   }
+
 
   async ngAfterViewInit(): Promise<void> {
 
@@ -38,16 +48,51 @@ export class CardVideoComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.streamingService.onStopSharing.pipe(
+      takeUntil(this.destroyer)
+    ).subscribe((stoped: boolean) => {
+      if (stoped) {
+        this.inStage = false;
+      }
+    });
+
+    this.streamingService.onChangeStreamChanel.pipe(
+      takeUntil(this.destroyer)
+    ).subscribe((activeChannel: StreamChannel) => {
+      if (this.streamChannel.id !== activeChannel.id) {
+        this.inStage = false;
+      }
+    });
   }
 
   public async startSharing(): Promise<void> {
     const canvas: any = document.getElementById('media-container-' + this.streamChannel.id) as HTMLCanvasElement;
     try {
-      this.streamChannel.stream = await initScreenShare(canvas, this.electronService);
-      this.isSharing = true;
+      await this.screenShareService.initScreenShare(this.streamChannel.id, canvas);
+      this.screenShareService.onStreamActive
+        .pipe(take(1))
+        .subscribe((stream: Stream) => {
+          if (this.streamChannel.id === stream.id) {
+            this.streamChannel.stream = stream.stream;
+            this.isSharing = true;
+
+            if (this.inStage) {
+              this.sendElementToStream(this.streamChannel);
+            }
+          }
+        });
     } catch (e) {
       console.warn(e);
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.destroyer.complete();
+  }
+
+  public sendElementToStream(streamChannel: StreamChannel): void {
+    this.sendToStream.emit(streamChannel);
+    this.inStage = true;
   }
 
 }

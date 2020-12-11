@@ -4,7 +4,7 @@ app-card-video {
     border-radius: 30px;
     min-width: 300px;
     max-width: 300px;
-    margin: 30px 15px;
+    margin: 15px;
     height: 200px;
     background-color: rgba(0, 0, 0, 0.2);
     box-shadow: 0 10px 50px 0 rgba(255, 255, 255, 0.05);
@@ -89,7 +89,7 @@ app-card-video {
 
 
     .topbar {
-      transition: var(--transition);
+      transition: var(--transition-all);
       position: absolute;
       width: 100%;
       top: 0;
@@ -106,7 +106,7 @@ app-card-video {
       color: white;
 
       p {
-        transition: var(--transition);
+        transition: var(--transition-all);
         opacity: 0;
         transform: scale(0.5);
         margin: 0;
@@ -114,7 +114,7 @@ app-card-video {
     }
 
     .toolbar {
-      transition: var(--transition);
+      transition: var(--transition-all);
       position: absolute;
       width: 100%;
       bottom: 0;
@@ -128,7 +128,7 @@ app-card-video {
       align-items: flex-end;
 
       button {
-        transition: var(--transition);
+        transition: var(--transition-all);
         padding: 10px 20px;
         background-color: rgba(255, 0, 0, 0.73);
         font-weight: bolder;
@@ -138,9 +138,13 @@ app-card-video {
         font-size: 16px;
         border-radius: 15px;
         color: white;
-
         opacity: 0;
         transform: scale(0.5);
+        margin: 0 5px;
+
+        &.gray {
+          background-color: rgb(146, 146, 146, .73) !important;
+        }
       }
     }
 

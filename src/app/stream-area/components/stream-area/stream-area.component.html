@@ -1,0 +1,12 @@
+<div class="logo-container">
+    <img [src]="logo" />
+</div>
+<video #videoElement>
+</video>
+<div class="banner-container" [ngClass]="{'show': banner?.show}">
+    <app-banner [data]="banner"></app-banner>
+</div>
+<div class="no-transmission" *ngIf="!hasVideo">
+    No transmission available
+</div>
+

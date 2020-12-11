@@ -4,21 +4,68 @@
 <div class="content">
     <div class="left">
         <div class="live">
-            <div class="stage-title">
-                Stage
-            </div>
             <div id="media-container" class="media-container">
+                <div class="topbar" *ngIf="!overlayInfo?.logo">
+                    <ion-button class="logo-btn" *ngIf="!overlayInfo?.logo" color="light"
+                                (click)="inputUploader.click()">
+                        <ion-icon name="image" slot="start"></ion-icon>
+                        Add logo
+                    </ion-button>
+                    <input hidden id="file-input" accept="image/*" #inputUploader type="file"
+                           (change)="handleFileInput($event.target.files)" [multiple]="false" />
+                </div>
+                <div class="logo-container" *ngIf="overlayInfo?.logo">
+                    <div class="image-container">
+                        <img [src]="overlayInfo.logo" />
+                        <div class="options-logo">
+                            <ion-button color="light" slot="icon-only" fill="clear" (click)="removeLogo()">
+                                <ion-icon name="trash"></ion-icon>
+                            </ion-button>
+                        </div>
+                    </div>
+                </div>
                 <div id="active-container" *ngIf="activeStreamChannel; else noTransmission">
                 </div>
-                <div class="toolbar" *ngIf="activeStreamChannel">
-                    <button (click)="streamToTwitch()" *ngIf="!isLiveSteaming">Stream to Twitch</button>
-                    <button (click)="stopTwitchStream()" *ngIf="isLiveSteaming">Stop live streaming</button>
+                <div class="toolbar" *ngIf="!bannerData.title || (bannerData.title && !bannerData.show)">
+                    <ion-button color="light" *ngIf="!bannerData.title" (click)="addBanner()">
+                        <ion-icon name="chatbox" slot="start"></ion-icon>
+                        Add banner
+                    </ion-button>
+                    <ion-button color="light" *ngIf="bannerData.title && !bannerData.show" (click)="showBanner()">Show
+                        banner
+                    </ion-button>
+                </div>
+
+                <div class="banner-container" [ngClass]="{'show': bannerData.show}">
+                    <app-banner [data]="bannerData"></app-banner>
                 </div>
             </div>
+            <div class="live-header">
+                <div class="stage-title">
+                    <ng-container *ngIf="!activeStreamChannel;else activeStage">Stage</ng-container>
+                    <ng-template #activeStage>{{activeStreamChannel.name}}
+                    </ng-template>
+                </div>
+                <ion-button color="danger" (click)="startOnlineStream()">
+                    <ion-icon slot="start" name="radio"></ion-icon>
+                    Live stream
+                </ion-button>
+                <ion-button color="danger" (click)="startRecording()">
+                    <ion-icon name="radio-button-on" slot="start"></ion-icon>
+                    Record stream
+                </ion-button>
+            </div>
+        </div>
+        <div class="channel-title">
+            Sources
         </div>
         <div class="channels">
             <app-card-video *ngFor="let channel of channels" [streamChannel]="channel"
-                            (sendToStream)="onChannelChange($event)">
+                            (sendToStream)="onChannelChange($event)" (removeStream)="onRemoveStream($event)">
+                <div class="live-info" *ngIf="activeStreamChannel?.id === channel.id">
+                    <div class="animative"></div>
+                    ON STAGE
+                </div>
             </app-card-video>
         </div>
     </div>
@@ -34,10 +81,10 @@
     </div>
 </div>
 
-<div class="background-image" [ngClass]="{'animating': animatingBackground}">
-    <img class="future" [src]="currentBackground ? currentBackground : 'assets/images/background.jpg'">
-    <img class="previous" *ngIf="previousBackground" [src]="previousBackground">
-</div>
+<!--<div class="background-image" [ngClass]="{'animating': animatingBackground}">-->
+<!--    <img class="future" [src]="currentBackground ? currentBackground : 'assets/images/background.jpg'">-->
+<!--    <img class="previous" *ngIf="previousBackground" [src]="previousBackground">-->
+<!--</div>-->
 
 
 <ng-template #noTransmission>

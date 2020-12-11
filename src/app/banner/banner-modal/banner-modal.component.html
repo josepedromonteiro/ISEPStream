@@ -1,0 +1,14 @@
+<div class="toolbar">
+    <ion-button shape="round" fill="clear" (click)="close()" color="dark">
+        <ion-icon slot="icon-only" name="close-circle"></ion-icon>
+    </ion-button>
+</div>
+<span class="title-modal">
+   Banner
+</span>
+<div class="banner-container">
+    <app-banner [mode]="mode.EDIT" [data]="iBannerData"></app-banner>
+</div>
+<div class="footer">
+    <ion-button [style.--background]="iBannerData.color" (click)="confirm()">Confirm</ion-button>
+</div>

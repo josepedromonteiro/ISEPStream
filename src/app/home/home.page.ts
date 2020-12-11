@@ -3,11 +3,9 @@ import JSMpeg from '@cycjimmy/jsmpeg-player';
 import { Subject } from 'rxjs';
 import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
 import { BannerData } from '../banner/banner/banner.component';
-import { ScreenShareComponent } from '../screen-share/screen-share.component';
 import { iosEnterAnimation, iosLeaveAnimation } from '../screen-share/screen-share.animations';
 import { ModalController } from '@ionic/angular';
 import { BannerModalComponent } from '../banner/banner-modal/banner-modal.component';
-import { isEmpty } from 'rxjs/operators';
 import { ElectronService } from 'ngx-electron';
 
 
@@ -247,36 +245,72 @@ export class HomePage implements AfterViewInit, OnDestroy {
     //https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
 
     const { exec } = this.electronService.remote.require('child_process');
-    exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"', (error, stdout, stderr) => {
-      if (error) {
-        console.error(error);
-      }
-
-      if (stdout) {
-        console.log(stdout);
-      }
-
-      if (stderr) {
-        console.error(error);
-      }
-    });
+    if (this.electronService.isWindows) {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startstreaming --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else if(this.electronService.isMacOS) {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else {
+      // Linux
+    }
   }
 
   startRecording() {
     const { exec } = this.electronService.remote.require('child_process');
-    exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "Cena 2"', (error, stdout, stderr) => {
-      if (error) {
-        console.error(error);
-      }
-
-      if (stdout) {
-        console.log(stdout);
-      }
-
-      if (stderr) {
-        console.error(error);
-      }
-    });
+    if (this.electronService.isWindows) {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startrecording --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else if(this.electronService.isMacOS) {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "ISEP Stream"', (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+        }
+  
+        if (stdout) {
+          console.log(stdout);
+        }
+  
+        if (stderr) {
+          console.error(stderr);
+        }
+      });
+    } else {
+      // Linux
+    }
   }
 }
 

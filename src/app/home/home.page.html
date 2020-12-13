@@ -76,7 +76,8 @@
             <h3>{{ playlist.name }}</h3>
             <button (click)="removePlaylist(playlist)">Remove Playlist</button>
             <ul *ngFor="let file of playlist.files">
-                <button>{{ file.name }}</button>
+                <h6>{{ file.name }}</h6>
+                <button (click)="sendToStage(file)">Send to Stage</button>
             </ul>
         </div>
     </div>

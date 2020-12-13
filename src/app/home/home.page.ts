@@ -11,7 +11,7 @@ import { Playlist } from './playlist';
 
 
 declare var WindowPeerConnection;
-export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share';
+export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share' | 'local-file';
 
 export interface StreamChannel {
   id: string;
@@ -136,6 +136,9 @@ export class HomePage implements AfterViewInit, OnDestroy {
         case 'screen-share':
           appendWebcam(event.stream, canvasMediaContainer);
           break;
+        case 'local-file':
+          appendVideo(event.url, canvasMediaContainer)
+          break
       }
       this.streamingService.onChangeStreamChanel.next(event);
       this.startLiveStream();
@@ -167,7 +170,6 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
     document.getElementById('active-container').innerHTML = '';
     this.streamingService.onStopSharing.next(true);
-
 
     this.secondWindow.removeStream();
     this.mainWindow.removeStream();
@@ -210,6 +212,17 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   addWebPlaylist = () => {
     
+  }
+
+  sendToStage = async (file: File) => {
+    this.onChannelChange({
+      id: file.path,
+      name: file.name,
+      type: 'local-file',
+      url: file.path,
+      preview: file.path,
+      stream: null
+    })
   }
 
   removePlaylist = (playlist: Playlist) => {
@@ -391,5 +404,20 @@ export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideo
   return el;
 }
 
+export function appendVideo(video: string, parent: HTMLElement): HTMLVideoElement {
+  const videoChildren = parent.getElementsByTagName('video');
+  Array.from(videoChildren).forEach((videoChild: HTMLVideoElement) => {
+    parent.removeChild(videoChild);
+  });
 
+  const el = document.createElement('video');
+  el.src = video;
+  el.autoplay = true;
+  el.muted = false;
+  el.width = 160;
+  el.height = 120;
 
+  parent.prepend(el);
+
+  return el;
+}

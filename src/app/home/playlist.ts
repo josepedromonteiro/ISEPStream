@@ -22,6 +22,11 @@ export class Playlist {
       this.files.push(file);
     });
   };
+
+  readLink = () => {
+    let file = new File(this.name, this.path);
+    this.files.push(file);
+  }
 }
 
 class File {

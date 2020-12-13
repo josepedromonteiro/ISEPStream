@@ -11,7 +11,7 @@ import { Playlist } from './playlist';
 
 
 declare var WindowPeerConnection;
-export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share' | 'local-file';
+export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share' | 'local-video' | 'web-video';
 
 export interface StreamChannel {
   id: string;
@@ -136,8 +136,11 @@ export class HomePage implements AfterViewInit, OnDestroy {
         case 'screen-share':
           appendWebcam(event.stream, canvasMediaContainer);
           break;
-        case 'local-file':
-          appendVideo(event.url, canvasMediaContainer)
+        case 'local-video':
+          appendLocalVideo(event.url, canvasMediaContainer)
+          break
+        case 'web-video':
+          appendWebVideo(event.url, canvasMediaContainer)
           break
       }
       this.streamingService.onChangeStreamChanel.next(event);
@@ -211,18 +214,36 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   addWebPlaylist = () => {
-    
+    let link = "https://www.youtube.com/embed/Bi37HFrAYyw?autoplay=1?controls=0"
+
+    if (link) {
+      let playlist = new Playlist(link, link)
+      playlist.readLink()
+
+      this.playlists.push(playlist)
+    }
   }
 
   sendToStage = async (file: File) => {
-    this.onChannelChange({
-      id: file.path,
-      name: file.name,
-      type: 'local-file',
-      url: file.path,
-      preview: file.path,
-      stream: null
-    })
+    if (file.name === file.path) {
+      this.onChannelChange({
+        id: file.path,
+        name: file.name,
+        type: 'web-video',
+        url: file.path,
+        preview: file.path,
+        stream: null
+      })
+    } else {
+      this.onChannelChange({
+        id: file.path,
+        name: file.name,
+        type: 'local-video',
+        url: file.path,
+        preview: file.path,
+        stream: null
+      })
+    }
   }
 
   removePlaylist = (playlist: Playlist) => {
@@ -404,20 +425,31 @@ export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideo
   return el;
 }
 
-export function appendVideo(video: string, parent: HTMLElement): HTMLVideoElement {
-  const videoChildren = parent.getElementsByTagName('video');
+export function appendLocalVideo(video: string, parent: HTMLElement): HTMLVideoElement {
+  const videoChildren = parent.getElementsByTagName('video')
   Array.from(videoChildren).forEach((videoChild: HTMLVideoElement) => {
-    parent.removeChild(videoChild);
+    parent.removeChild(videoChild)
   });
 
-  const el = document.createElement('video');
-  el.src = video;
-  el.autoplay = true;
-  el.muted = false;
-  el.width = 160;
-  el.height = 120;
+  const el = document.createElement('video')
+  el.src = video
+  el.autoplay = true
 
-  parent.prepend(el);
+  parent.prepend(el)
 
-  return el;
+  return el
+}
+
+export function appendWebVideo(video: string, parent: HTMLElement): HTMLIFrameElement {
+  const iFrameChildren = parent.getElementsByTagName('iframe')
+  Array.from(iFrameChildren).forEach((iFrameChild: HTMLIFrameElement) => {
+    parent.removeChild(iFrameChild)
+  });
+
+  const el = document.createElement('iframe')
+  el.src = video
+
+  parent.prepend(el)
+
+  return el
 }

@@ -71,7 +71,7 @@
     </div>
     <div class="right">
         <button (click)="addLocalPlaylist()">Add Local Playlist</button>
-        <button (click)="addWebPlaylist()">Add Web Playlist</button>
+        <button (click)="addWebPlaylist()">Add YouTube Video/Playlist</button>
         <div *ngFor="let playlist of playlists">
             <h3>{{ playlist.name }}</h3>
             <button (click)="removePlaylist(playlist)">Remove Playlist</button>

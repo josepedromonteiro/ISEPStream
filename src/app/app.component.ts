@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
@@ -10,7 +10,7 @@ import { ElectronService } from 'ngx-electron';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
@@ -19,8 +19,12 @@ export class AppComponent {
   ) {
     this.initializeApp();
 
-    if (this.electronService.isWindows) {
-    //   document.body.classList.add('windows');
+
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.electronService.isWindows) {
+      document.getElementById('titlebar').remove();
     }
   }
 

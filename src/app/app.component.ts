@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-
+import { AfterViewInit, Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -10,7 +9,7 @@ import { ElectronService } from 'ngx-electron';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
@@ -18,9 +17,18 @@ export class AppComponent {
     private electronService: ElectronService
   ) {
     this.initializeApp();
+  }
 
+  ngAfterViewInit(): void {
     if (this.electronService.isWindows) {
-    //   document.body.classList.add('windows');
+      const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches
+      this.electronService.ipcRenderer.send('changeTheme', isDark)
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+        this.electronService.ipcRenderer.send('changeTheme', event.matches)
+      });
+    } else {
+      document.getElementById('titlebar').remove();
     }
   }
 

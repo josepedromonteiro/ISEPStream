@@ -2,25 +2,51 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <title>ISEP Stream</title>
+    <meta charset="utf-8" />
+    <title>ISEP Stream</title>
 
-  <base href="./" />
+    <base href="./" />
 
-  <meta name="color-scheme" content="light dark" />
-  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="format-detection" content="telephone=no" />
-  <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport"
+          content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
 
-  <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
+    <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
 
-  <!-- add to homescreen for ios -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- add to homescreen for ios -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+
+    <link href="./theme/custom-window-style.css" rel="stylesheet" type="text/css">
+    <script type="module" src="./scripts/frameless.js"></script>
 </head>
 
 <body>
-  <app-root></app-root>
+<header id="titlebar">
+    <div id="drag-region">
+        <div id="window-title">
+            <span id="appTitle">ISEP Stream</span>
+        </div>
+        <div id="window-controls">
+            <div class="button" id="min-button">
+                <span>&#xE921;</span>
+            </div>
+            <div class="button" id="max-button">
+                <span>&#xE922;</span>
+            </div>
+            <div class="button" id="restore-button">
+                <span>&#xE923;</span>
+            </div>
+            <div class="button" id="close-button">
+                <span>&#xE8BB;</span>
+            </div>
+        </div>
+    </div>
+</header>
+<app-root></app-root>
 </body>
 </html>
 

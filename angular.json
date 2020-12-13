@@ -37,9 +37,13 @@
               },
               {
                 "input": "src/global.scss"
+              },
+              {
+                "input": "src/theme/custom-window-style.css"
               }
             ],
             "scripts": [
+              "scripts/frameless.js",
               "scripts/window-rtc.js"
             ]
           },

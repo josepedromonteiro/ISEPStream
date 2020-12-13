@@ -1,26 +1,21 @@
-const {app, TouchBar, nativeImage} = require('electron');
-const url = require("url");
-const path = require("path");
+const { app, TouchBar, nativeImage, ipcMain } = require('electron');
+const url = require('url');
+const path = require('path');
 const p2pChannel = require('./scripts/window-rtc.js').main;
-const os = require('os');
 const glasstron = require('glasstron');
 
 const TIMEOUT = 1000;
 let mainWindow, secondWindow;
 
-app.commandLine.appendSwitch("enable-transparent-visuals");
-
+app.commandLine.appendSwitch('enable-transparent-visuals');
 
 // app.commandLine.appendSwitch('enable-transparent-visuals');
 // app.commandLine.appendSwitch('disable-gpu');
 
 function createSecondWindow() {
-
-
     secondWindow = new glasstron.BrowserWindow({
         width: 1100,
         height: 800,
-        // show: false,
         frame: process.platform === 'win32',
         title: 'ISEP Stage',
         webPreferences: {
@@ -30,16 +25,14 @@ function createSecondWindow() {
         }
     });
 
-
     global.secondWindow = secondWindow;
-
 
     secondWindow.setMenuBarVisibility(false);
 
     secondWindow.loadURL(
         url.format({
             pathname: path.join(__dirname, `/www/index.html`),
-            protocol: "file:",
+            protocol: 'file:',
             slashes: true,
             hash: '/stream-area'
         })
@@ -53,16 +46,15 @@ function createSecondWindow() {
         secondWindow = null
     });
 
-
     secondWindow.once('ready-to-show', () => {
         setTimeout(() => {
             // splash.destroy();
             p2pChannel.initChannel();
             // windowA and windowB are previously initiated BrowserWindows
-            p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
-            p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
+            p2pChannel.addClient({ window: mainWindow, name: 'mainWindow' });
+            p2pChannel.addClient({ window: secondWindow, name: 'secondWindow' });
 
-            if (process.platform === "win32") {
+            if (process.platform === 'win32') {
                 secondWindow.maximize();
             } else {
                 secondWindow.setFullScreen(true);
@@ -77,43 +69,52 @@ function createSecondWindow() {
 }
 
 function createWindow() {
+    if (process.platform === 'win32') {
+        const config = {
+            width: 1100,
+            height: 800,
+            frame: false,
+            title: 'ISEP Stream',
+            webPreferences: {
+                nodeIntegration: true,
+                enableRemoteModule: true,
+                experimentalFeatures: true,
+                preload: path.join(__dirname, 'preload.js')
+            }
+        };
 
-    const config = {
-        width: 1100,
-        height: 800,
-        show: true,
-        titleBarStyle: process.platform === "win32" ? 'hidden' : 'hiddenInset',
-        frame: process.platform !== "win32",
-        resizable: true,
-        title: "ISEP Stream",
-        blur: true,
-        blurType: "blurbehind",
-        blurGnomeSigma: 100,
-        blurCornerRadius: 30,
-        vibrancy: "fullscreen-ui",
-        webPreferences: {
-            nodeIntegration: true,
-            enableRemoteModule: true,
-            experimentalFeatures: true,
-            preload: path.join(__dirname, 'preload.js'),
-        }
-    }
-
-    if (process.platform === "win32") {
-        const {BrowserWindow} = require("electron-acrylic-window");
+        const { BrowserWindow } = require('electron-acrylic-window');
         mainWindow = new BrowserWindow(config);
     } else {
+        const config = {
+            width: 1100,
+            height: 800,
+            show: true,
+            frame: true,
+            resizable: true,
+            title: 'ISEP Stream',
+            blur: true,
+            blurType: 'blurbehind',
+            blurGnomeSigma: 100,
+            blurCornerRadius: 30,
+            vibrancy: 'fullscreen-ui',
+            webPreferences: {
+                nodeIntegration: true,
+                enableRemoteModule: true,
+                experimentalFeatures: true,
+                preload: path.join(__dirname, 'preload.js')
+            }
+        };
+
         mainWindow = new glasstron.BrowserWindow(config);
     }
-
-
 
     mainWindow.setMenuBarVisibility(false);
 
     mainWindow.loadURL(
         url.format({
             pathname: path.join(__dirname, `/www/index.html`),
-            protocol: "file:",
+            protocol: 'file:',
             slashes: true
         })
         // path.join(__dirname, `/www/index.html`)
@@ -128,22 +129,22 @@ function createWindow() {
     });
 
     mainWindow.once('ready-to-show', () => {
-    //     setTimeout(() => {
-    //         // splash.destroy();
-    //         // mainWindow.show();
-    //         // mainWindow.focus();
-    //     }, TIMEOUT + 500)
-
+        // setTimeout(() => {
+        //     splash.destroy();
+        //     mainWindow.show();
+        //     mainWindow.focus();
+        // }, TIMEOUT + 500)
     });
 
     setUpTouchBar(mainWindow);
 
+    ipcMain.on('changeTheme', (event, args) => {
+        changeWindow(args);
+    });
 }
 
 function setUpTouchBar(win) {
-
-    const playIcon = nativeImage.createFromPath('./src/assets/native/play-circle.png').resize({height: 25});
-
+    const playIcon = nativeImage.createFromPath('./src/assets/native/play-circle.png').resize({ height: 25 });
 
     const button = new TouchBar.TouchBarButton({
         label: `GO LIVE`,
@@ -153,13 +154,12 @@ function setUpTouchBar(win) {
         iconPosition: 'left',
         click: () => {
             // update();
-        },
-
+        }
     });
+
     const touchBar = new TouchBar({
-        items: [button],
+        items: [button]
     });
-
 
     win.setTouchBar(touchBar);
 }
@@ -169,7 +169,7 @@ function setUpTouchBar(win) {
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit()
 })
-//
+
 app.on('activate', function () {
     if (mainWindow === null) {
         createWindow();
@@ -183,7 +183,6 @@ app.on('activate', function () {
 let splash;
 
 app.on('ready', () => {
-
     // splash = new BrowserWindow({width: 810, height: 610, transparent: true, frame: false, alwaysOnTop: true});
     // splash.loadURL(
     //     url.format({
@@ -192,10 +191,9 @@ app.on('ready', () => {
     //       slashes: true
     //     }),);
 
-
     setTimeout(
         createWindow,
-        process.platform == "linux" ? 1000 : 0
+        process.platform == 'linux' ? 1000 : 0
         // Electron has a bug on linux where it
         // won't initialize properly when using
         // transparency. To work around that, it
@@ -205,9 +203,21 @@ app.on('ready', () => {
     createSecondWindow();
 });
 
-
 const setupEvents = require('./installers/setupEvents')
 if (setupEvents.handleSquirrelEvent()) {
     // squirrel event handled and app will exit in 1000ms, so don't do anything else
     return;
+}
+
+function changeWindow(isDark) {
+    if (process.platform !== 'win32') {
+        return;
+    }
+    const op = {
+        theme: isDark ? 'dark' : 'light',
+        effect: 'acrylic',
+        maximumRefreshRate: 60,
+        disableOnBlur: true
+    };
+    mainWindow.setVibrancy(op);
 }

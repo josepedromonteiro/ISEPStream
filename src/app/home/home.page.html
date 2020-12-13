@@ -70,12 +70,13 @@
         </div>
     </div>
     <div class="right">
-        <button (click)="addPlaylist()">Add Playlist</button>
+        <button (click)="addLocalPlaylist()">Add Local Playlist</button>
+        <button (click)="addWebPlaylist()">Add Web Playlist</button>
         <div *ngFor="let playlist of playlists">
             <h3>{{ playlist.name }}</h3>
             <button (click)="removePlaylist(playlist)">Remove Playlist</button>
             <ul *ngFor="let file of playlist.files">
-                <h6>{{ file.name }}</h6>
+                <button>{{ file.name }}</button>
             </ul>
         </div>
     </div>

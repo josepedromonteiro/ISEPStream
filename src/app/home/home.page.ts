@@ -187,7 +187,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
   }
 
-  addPlaylist = () => {
+  addLocalPlaylist = () => {
     let directory = this.electronService.remote.dialog.showOpenDialogSync({ properties: ['openDirectory']});
 
     if (directory && directory[0]) {
@@ -206,6 +206,10 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
       this.playlists.push(playlist);
     }
+  }
+
+  addWebPlaylist = () => {
+    
   }
 
   removePlaylist = (playlist: Playlist) => {

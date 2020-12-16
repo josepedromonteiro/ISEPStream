@@ -138,6 +138,8 @@ export class HomePage implements AfterViewInit, OnDestroy {
           break;
         case 'local-video':
           appendLocalVideo(event.url, canvasMediaContainer)
+          const canvas = document.getElementById('local-video') as HTMLCanvasElement;
+          event.stream = initLocalVideo(canvas)
           break
         case 'web-video':
           appendWebVideo(event.url, canvasMediaContainer)
@@ -235,6 +237,8 @@ export class HomePage implements AfterViewInit, OnDestroy {
         stream: null
       })
     } else {
+      const canvas = document.getElementById("local-video")
+
       this.onChannelChange({
         id: file.path,
         name: file.name,
@@ -425,6 +429,14 @@ export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideo
   return el;
 }
 
+export function initLocalVideo(canvas: any): MediaStream {
+  const stream = canvas.captureStream() as MediaStream;
+
+  canvas.setAttribute('id', 'active-element');
+
+  return stream;
+}
+
 export function appendLocalVideo(video: string, parent: HTMLElement): HTMLVideoElement {
   const videoChildren = parent.getElementsByTagName('video')
   Array.from(videoChildren).forEach((videoChild: HTMLVideoElement) => {
@@ -435,9 +447,20 @@ export function appendLocalVideo(video: string, parent: HTMLElement): HTMLVideoE
   el.src = video
   el.autoplay = true
 
+  el.setAttribute('id', 'local-video')
+
   parent.prepend(el)
 
   return el
+}
+
+export function initWebVideo(url: string, canvas: any): MediaStream {
+  const element = new JSMpeg.VideoElement(canvas, url, {});
+  const stream = element.els.canvas.captureStream() as MediaStream;
+
+  element.els.canvas.setAttribute('id', 'active-element');
+
+  return stream;
 }
 
 export function appendWebVideo(video: string, parent: HTMLElement): HTMLIFrameElement {

@@ -1,0 +1,191 @@
+app-playlist {
+  .playlist-container {
+    width: 90%;
+    height: 100%;
+    overflow: scroll;
+    background-color: rgba(var(--ion-color-light-rgb), 0.5);
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    position: relative;
+    margin: auto;
+  }
+
+  ion-toolbar {
+    --background: transparent;
+  }
+
+  .playlist-tabs {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: auto;
+    position: sticky;
+    top: 0px;
+    z-index: 99;
+
+    .tabs {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      padding-bottom: 16px;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    .more {
+      ion-button {
+        --padding-start: 5px;
+        --padding-end: 5px;
+      }
+
+      padding-bottom: 16px;
+    }
+
+    .playlist-tab {
+      background-color: rgba(var(--ion-color-light-rgb), 0.5);
+      padding: 5px 16px;
+      border-radius: 30px;
+      margin-right: 10px;
+      min-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid rgba(var(--ion-color-dark-rgb), 1);
+      cursor: pointer;
+      backdrop-filter: blur(15px) saturate(180%);
+
+      &.active {
+        background-color: rgba(var(--ion-color-dark-rgb), 0.8);
+        color: var(--ion-color-light);
+      }
+    }
+  }
+
+  .empty-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    flex-direction: column;
+    z-index: -1;
+
+    img {
+      height: 150px;
+      margin-bottom: 30px;
+    }
+
+  }
+
+  ion-list {
+    background: transparent !important;
+    padding-bottom: 100px !important;
+
+    ion-item-sliding {
+      width: 95%;
+      user-select: none;
+      margin: 10px auto;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  }
+
+  .playlist-options {
+    background-color: var(--ion-color-primary);
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: var(--transition-all);
+    min-width: 200px;
+    border-radius: 50px;
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 10px;
+
+      ion-icon {
+        font-size: 25px;
+        cursor: pointer;
+      }
+    }
+
+    .options-icn {
+      max-width: 40px;
+      transition: var(--transition-all);
+    }
+
+    .label {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+
+      ion-icon {
+        margin-right: 15px;
+      }
+    }
+
+    &.opened {
+      min-width: 90%;
+      bottom: 20px;
+      border-radius: 15px;
+
+      .toolbar {
+        cursor: auto;
+      }
+
+      .options-icn {
+        max-width: 0;
+        margin: 0;
+      }
+
+      .content {
+        max-height: 200px;
+        overflow: auto;
+        padding: 16px;
+      }
+    }
+
+    .content {
+      max-height: 0;
+      transition: var(--transition-all);
+      display: block;
+
+      .options-item {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(0, 0, 0, .1);
+        border-radius: 20px;
+        padding: 10px 16px;
+        cursor: pointer;
+        transition: var(--transition-all);
+
+
+        .flex {
+          display: flex;
+        }
+
+        &:hover {
+          background-color: rgba(0, 0, 0, .2);
+        }
+
+        ion-icon {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+}

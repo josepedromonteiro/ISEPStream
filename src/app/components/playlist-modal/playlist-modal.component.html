@@ -1,0 +1,27 @@
+<div class="toolbar">
+    <ion-button shape="round" fill="clear" (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close-circle"></ion-icon>
+    </ion-button>
+</div>
+<span class="title">
+   Playlists
+</span>
+<span class="subtitle">Pick the playlist name and also it's location</span>
+<form class="container" [formGroup]="form">
+    <div class="playlist-content">
+        <ion-item>
+            <ion-label position="floating">Playlist name</ion-label>
+            <ion-input formControlName="name"></ion-input>
+        </ion-item>
+        <ion-button (click)="openParentLocalFiles()">
+            <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+            Select directory
+        </ion-button>
+    </div>
+    <p class="info"[ngClass]="{'show': playlist?.path?.length > 0}">{{playlist?.path}} -> {{(playlist?.files | async)?.length}} files</p>
+
+</form>
+
+<div class="footer">
+    <ion-button color="success" (click)="confirm()">Create playlist</ion-button>
+</div>

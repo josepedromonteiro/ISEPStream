@@ -1,0 +1,54 @@
+app-playlist-modal {
+  justify-content: flex-start !important;
+  flex-wrap: wrap;
+  position: relative;
+
+  ion-item {
+    border-radius: 15px;
+    flex: 1;
+    margin: 0 20px;
+  }
+
+  .container {
+    flex: 1;
+    margin-bottom: 70px;
+    flex-wrap: wrap;
+
+    ion-button {
+      margin-right: 20px;
+    }
+
+    .info {
+      margin-top: 0;
+      margin-left: 24px;
+      width: 100%;
+      font-weight: bold;
+      opacity: 0;
+      transition: var(--transition-all);
+
+      &.show {
+        opacity: .5 !important;
+      }
+    }
+  }
+
+
+  .playlist-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    ion-button {
+      margin-left: 20px;
+    }
+  }
+
+  .footer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
+    padding-bottom: 20px;
+  }
+}

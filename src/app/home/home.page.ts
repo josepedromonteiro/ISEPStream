@@ -450,6 +450,7 @@ export function appendLocalVideo(video: string, parent: HTMLElement): HTMLVideoE
   const el = document.createElement('video');
   el.src = video;
   el.autoplay = true;
+  el.muted = true;
 
   el.setAttribute('id', 'local-video');
 

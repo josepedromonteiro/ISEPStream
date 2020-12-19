@@ -4,11 +4,10 @@ import { Subject } from 'rxjs';
 import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
 import { BannerData } from '../components/banner/banner/banner.component';
 import { iosEnterAnimation, iosLeaveAnimation } from '../components/screen-share/screen-share.animations';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { BannerModalComponent } from '../components/banner/banner-modal/banner-modal.component';
 import { ElectronService } from 'ngx-electron';
 import { Playlist, File } from './playlist';
-
 
 declare var WindowPeerConnection;
 export type StreamChannelType = 'webcam' | 'ip-camera' | 'screen-share' | 'local-video' | 'web-video';
@@ -30,7 +29,6 @@ export interface OverlayInfo {
   };
 }
 
-
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -41,7 +39,8 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   constructor(private streamingService: StreamingService,
               private modalController: ModalController,
-              private electronService: ElectronService) {
+              private electronService: ElectronService,
+              public alertController: AlertController) {
 
     this.channels = [
       {
@@ -319,76 +318,50 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   startOnlineStream() {
-    // /Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"
-    // https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
-
-    const { exec } = this.electronService.remote.require('child_process');
+    const { exec } = this.electronService.remote.require('child_process')
     if (this.electronService.isWindows) {
-      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startstreaming --scene "ISEP Stream"', (error, stdout, stderr) => {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startstreaming --scene "ISEP Stream"', (error, _stdout, _stderr) => {
         if (error) {
-          console.error(error);
+          console.error(error)
+          this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
         }
-
-        if (stdout) {
-          console.log(stdout);
-        }
-
-        if (stderr) {
-          console.error(stderr);
-        }
-      });
-    } else if (this.electronService.isMacOS) {
-      exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "ISEP Stream"', (error, stdout, stderr) => {
+      })
+    } else if(this.electronService.isMacOS) {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "ISEP Stream"', (error, _stdout, _stderr) => {
         if (error) {
-          console.error(error);
+          console.error(error)
+          this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
         }
-
-        if (stdout) {
-          console.log(stdout);
-        }
-
-        if (stderr) {
-          console.error(stderr);
-        }
-      });
+      })
     } else {
-      // Linux
+      this.presentAlert('Feature Not Available', 'Starting a livestream is not compatible with this system.')
     }
   }
 
   startRecording() {
-    const { exec } = this.electronService.remote.require('child_process');
+    const { exec } = this.electronService.remote.require('child_process')
     if (this.electronService.isWindows) {
-      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startrecording --scene "ISEP Stream"', (error, stdout, stderr) => {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startrecording --scene "ISEP Stream"', (error, _stdout, _stderr) => {
         if (error) {
-          console.error(error);
+          console.error(error)
+          this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
         }
-
-        if (stdout) {
-          console.log(stdout);
-        }
-
-        if (stderr) {
-          console.error(stderr);
-        }
-      });
-    } else if (this.electronService.isMacOS) {
-      exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "ISEP Stream"', (error, stdout, stderr) => {
+      })
+    } else if(this.electronService.isMacOS) {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "ISEP Stream"', (error, _stdout, _stderr) => {
         if (error) {
-          console.error(error);
+          console.error(error)
+          this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
         }
-
-        if (stdout) {
-          console.log(stdout);
-        }
-
-        if (stderr) {
-          console.error(stderr);
-        }
-      });
+      })
     } else {
-      // Linux
+      this.presentAlert('Feature Not Available', 'Recording the screen is not compatible with this system.')
     }
+  }
+
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({ header, message, buttons: ['OK'] })
+    await alert.present()
   }
 }
 

@@ -182,7 +182,7 @@ function WindowPeerConnection(windowName) {
      * @param {string} receiverName - name of the receiving BrowserWindow
      */
     this.sendStream = function (receiverName) {
-        log(thisObj.windowName + ": createOffer start");
+        console.log(thisObj.windowName + ": createOffer start");
 
         const offerOptions = {
             offerToReceiveVideo: 1
@@ -195,8 +195,9 @@ function WindowPeerConnection(windowName) {
                 );
 
                 thisObj.peerConnection.setLocalDescription(offer);
+                console.log('offer', offer);
             }, function (error) {
-                log(thisObj.windowName + ": Error when creating an offer " + error);
+                console.log(thisObj.windowName + ": Error when creating an offer " + error);
             },
             offerOptions
         );
@@ -206,12 +207,12 @@ function WindowPeerConnection(windowName) {
      * Sends an offer to the target peer.
      */
     async function handleOffer(offer, senderName) {
-        log(thisObj.windowName + ": Setting remoteDescription");
+        console.log(thisObj.windowName + ": Setting remoteDescription");
         await thisObj.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-        log(thisObj.windowName + ": remoteDescription set");
+        console.log(thisObj.windowName + ": remoteDescription set");
         //create an answer to an offer
         thisObj.peerConnection.createAnswer(function (answer) {
-            log(thisObj.windowName + ": Creating answer");
+            console.log(thisObj.windowName + ": Creating answer");
             thisObj.peerConnection.setLocalDescription(answer);
             sendMessage(
                 senderName,

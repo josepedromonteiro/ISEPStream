@@ -7,19 +7,19 @@ document.onreadystatechange = () => {
 
 let win;
 function handleWindowControls() {
-    document.getElementById('min-button').addEventListener("click", () => {
+    document.getElementById('min-button')?.addEventListener("click", () => {
         win.minimize();
         toggleMaxRestoreButtons();
     });
-    document.getElementById('max-button').addEventListener("click", () => {
+    document.getElementById('max-button')?.addEventListener("click", () => {
         win.maximize();
         toggleMaxRestoreButtons();
     });
-    document.getElementById('restore-button').addEventListener("click", () => {
+    document.getElementById('restore-button')?.addEventListener("click", () => {
         win.unmaximize();
         toggleMaxRestoreButtons();
     });
-    document.getElementById('close-button').addEventListener("click", () => {
+    document.getElementById('close-button')?.addEventListener("click", () => {
         win.close();
         toggleMaxRestoreButtons();
     });

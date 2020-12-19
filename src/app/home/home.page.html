@@ -70,25 +70,19 @@
         </div>
     </div>
     <div class="right">
-        <button (click)="addLocalPlaylist()">Add Local Playlist</button>
-        <button (click)="addWebPlaylist()">Add YouTube Video/Playlist</button>
-        <div *ngFor="let playlist of playlists">
-            <h3>{{ playlist.name }}</h3>
-            <button (click)="removePlaylist(playlist)">Remove Playlist</button>
-            <ul *ngFor="let file of playlist.files">
-                <h6>{{ file.name }}</h6>
-                <button (click)="sendToStage(file)">Send to Stage</button>
-            </ul>
-        </div>
+        <!--        <button (click)="addLocalPlaylist()">Add Local Playlist</button>-->
+        <!--        <button (click)="addWebPlaylist()">Add YouTube Video/Playlist</button>-->
+        <!--        <div *ngFor="let playlist of playlists">-->
+        <!--            <h3>{{ playlist.name }}</h3>-->
+        <!--            <button (click)="removePlaylist(playlist)">Remove Playlist</button>-->
+        <!--            <ul *ngFor="let file of playlist.files">-->
+        <!--                <h6>{{ file.name }}</h6>-->
+        <!--                <button (click)="sendToStage(file)">Send to Stage</button>-->
+        <!--            </ul>-->
+        <!--        </div>-->
+        <app-playlist (sendToStage)="sendToStage($event)" (stopStreaming)="cleanStage()"></app-playlist>
     </div>
 </div>
-
-<!--<div class="background-image" [ngClass]="{'animating': animatingBackground}">-->
-<!--    <img class="future" [src]="currentBackground ? currentBackground : 'assets/images/background.jpg'">-->
-<!--    <img class="previous" *ngIf="previousBackground" [src]="previousBackground">-->
-<!--</div>-->
-
-
 <ng-template #noTransmission>
     <div class="no-transmission">
         No transmission available

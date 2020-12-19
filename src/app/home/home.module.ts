@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
-import { CardVideoComponent } from '../card-video/card-video.component';
+import { CardVideoComponent } from '../components/card-video/card-video.component';
 import { SharedModule } from '../../shared.module';
 
 
@@ -19,4 +19,5 @@ import { SharedModule } from '../../shared.module';
   ],
   declarations: [HomePage, CardVideoComponent]
 })
-export class HomePageModule {}
+export class HomePageModule {
+}

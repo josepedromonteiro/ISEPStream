@@ -1,4 +1,4 @@
-const { app, TouchBar, nativeImage, ipcMain } = require('electron');
+const {app, TouchBar, nativeImage, ipcMain} = require('electron');
 const url = require('url');
 const path = require('path');
 const p2pChannel = require('./scripts/window-rtc.js').main;
@@ -51,8 +51,8 @@ function createSecondWindow() {
             // splash.destroy();
             p2pChannel.initChannel();
             // windowA and windowB are previously initiated BrowserWindows
-            p2pChannel.addClient({ window: mainWindow, name: 'mainWindow' });
-            p2pChannel.addClient({ window: secondWindow, name: 'secondWindow' });
+            p2pChannel.addClient({window: mainWindow, name: 'mainWindow'});
+            p2pChannel.addClient({window: secondWindow, name: 'secondWindow'});
 
             if (process.platform === 'win32') {
                 secondWindow.maximize();
@@ -83,7 +83,7 @@ function createWindow() {
             }
         };
 
-        const { BrowserWindow } = require('electron-acrylic-window');
+        const {BrowserWindow} = require('electron-acrylic-window');
         mainWindow = new BrowserWindow(config);
     } else {
         const config = {
@@ -98,6 +98,7 @@ function createWindow() {
             blurGnomeSigma: 100,
             blurCornerRadius: 30,
             vibrancy: 'fullscreen-ui',
+            titleBarStyle: 'hiddenInset',
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
@@ -128,6 +129,8 @@ function createWindow() {
         secondWindow.close();
     });
 
+    global.mainWindow = mainWindow;
+
     mainWindow.once('ready-to-show', () => {
         // setTimeout(() => {
         //     splash.destroy();
@@ -144,7 +147,7 @@ function createWindow() {
 }
 
 function setUpTouchBar(win) {
-    const playIcon = nativeImage.createFromPath('./src/assets/native/play-circle.png').resize({ height: 25 });
+    const playIcon = nativeImage.createFromPath('./src/assets/native/play-circle.png').resize({height: 25});
 
     const button = new TouchBar.TouchBarButton({
         label: `GO LIVE`,

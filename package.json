@@ -1,5 +1,5 @@
 {
-  "name": "ISEP Stream",
+  "name": "ISEPStream",
   "version": "0.0.1",
   "author": "Goncalo Silva | Jose Monteiro :: ISEP",
   "homepage": "https://ionicframework.com/",
@@ -41,6 +41,7 @@
     "dom-to-image": "^2.6.0",
     "dom-to-image-more": "^2.8.0",
     "electron-acrylic-window": "^0.5.4",
+    "electron-json-storage": "^4.3.0",
     "electron-peer-connection": "^1.0.6",
     "glasstron": "^0.0.5",
     "html2canvas": "^1.0.0-rc.7",
@@ -51,6 +52,7 @@
     "rxjs": "~6.5.5",
     "stream": "0.0.2",
     "tslib": "^2.0.0",
+    "uuid": "^8.3.2",
     "windows10-electron-vibrancy": "^1.0.1",
     "zone.js": "~0.10.3"
   },

@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { initIPCamera, initWebcam, StreamChannel } from '../home/home.page';
+import { initIPCamera, initWebcam, StreamChannel } from '../../home/home.page';
 import { ElectronService } from 'ngx-electron';
-import { ScreenShareService, Stream } from '../services/screen-share/screen-share.service';
+import { ScreenShareService, Stream } from '../../services/screen-share/screen-share.service';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
-import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
+import { StreamingService } from '../../stream-area/components/stream-area/streaming.service';
 
 @Component({
   selector: 'app-card-video',

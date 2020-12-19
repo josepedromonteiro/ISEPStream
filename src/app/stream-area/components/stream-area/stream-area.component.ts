@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { StreamingService } from './streaming.service';
 import { ElectronService } from 'ngx-electron';
-import { BannerData } from '../../../banner/banner/banner.component';
+import { BannerData } from '../../../components/banner/banner/banner.component';
 // const WindowPeerConnection = require('electron-peer-connection').WindowPeerConnection;
 
 declare var WindowPeerConnection;
@@ -13,7 +13,7 @@ declare var WindowPeerConnection;
   styleUrls: ['./stream-area.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class StreamAreaComponent implements OnInit {
+export class StreamAreaComponent implements OnInit, AfterViewInit {
 
   @ViewChild('videoElement') videoElement: ElementRef;
   public logo: string;
@@ -28,6 +28,7 @@ export class StreamAreaComponent implements OnInit {
     setTimeout(() => {
       const secondWindow = new WindowPeerConnection('secondWindow');
       secondWindow.onReceivedStream((stream) => {
+        console.log('s', stream);
         if (!stream) {
           this.hasVideo = false;
           this.videoElement.nativeElement.srcObject = null;
@@ -52,6 +53,24 @@ export class StreamAreaComponent implements OnInit {
       this.detectChange.detectChanges();
     });
 
+    this.electronService.ipcRenderer.on('video', (event: Electron.IpcRendererEvent, url: string) => {
+      this.hasVideo = true;
+      this.videoElement.nativeElement.src = url;
+      this.videoElement.nativeElement.autoplay = true;
+      this.videoElement.nativeElement.muted = false;
+      this.detectChange.detectChanges();
+    });
+
+  }
+
+  ngAfterViewInit(): void {
+    this.videoElement.nativeElement.onended = () => {
+      this.electronService.ipcRenderer.sendTo(
+        this.electronService.remote.getGlobal('mainWindow').webContents.id,
+        'videoEnded',
+        true
+      );
+    };
   }
 
 }

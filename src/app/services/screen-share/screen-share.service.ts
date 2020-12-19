@@ -1,11 +1,11 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
 import { ModalController } from '@ionic/angular';
-import { ScreenShareComponent, Source } from '../../screen-share/screen-share.component';
+import { ScreenShareComponent, Source } from '../../components/screen-share/screen-share.component';
 import { DesktopCapturerSource } from 'electron';
 import { appendWebcam } from '../../home/home.page';
 import { Subject } from 'rxjs';
-import { iosEnterAnimation, iosLeaveAnimation } from '../../screen-share/screen-share.animations';
+import { iosEnterAnimation, iosLeaveAnimation } from '../../components/screen-share/screen-share.animations';
 
 export interface Stream {
   id: string;

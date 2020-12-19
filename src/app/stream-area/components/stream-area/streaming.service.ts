@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { StreamChannel } from '../../../home/home.page';
-import { BannerData } from '../../../banner/banner/banner.component';
+import { BannerData } from '../../../components/banner/banner/banner.component';
 
 @Injectable({
   providedIn: 'root'

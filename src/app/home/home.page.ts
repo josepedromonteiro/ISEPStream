@@ -2,12 +2,12 @@ import { AfterViewInit, Component, OnDestroy, ViewEncapsulation } from '@angular
 import JSMpeg from '@cycjimmy/jsmpeg-player';
 import { Subject } from 'rxjs';
 import { StreamingService } from '../stream-area/components/stream-area/streaming.service';
-import { BannerData } from '../banner/banner/banner.component';
-import { iosEnterAnimation, iosLeaveAnimation } from '../screen-share/screen-share.animations';
+import { BannerData } from '../components/banner/banner/banner.component';
+import { iosEnterAnimation, iosLeaveAnimation } from '../components/screen-share/screen-share.animations';
 import { ModalController } from '@ionic/angular';
-import { BannerModalComponent } from '../banner/banner-modal/banner-modal.component';
+import { BannerModalComponent } from '../components/banner/banner-modal/banner-modal.component';
 import { ElectronService } from 'ngx-electron';
-import { Playlist } from './playlist';
+import { Playlist, File } from './playlist';
 
 
 declare var WindowPeerConnection;
@@ -39,27 +39,6 @@ export interface OverlayInfo {
 })
 export class HomePage implements AfterViewInit, OnDestroy {
 
-  public channels: StreamChannel[] = [];
-  public activeStreamChannel: StreamChannel;
-  // private rtcpPeerConnection: RTCPeerConnection;
-  private isLiveSteaming = false;
-  private destroyer: Subject<void>;
-  private mainWindow: typeof WindowPeerConnection;
-  private secondWindow: typeof WindowPeerConnection;
-  public previousBackground: string;
-  public currentBackground: string;
-  public animatingBackground = false;
-  public overlayInfo: OverlayInfo = {};
-  public bannerData: BannerData;
-  private toBase64: (file) => Promise<string> = file => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-
-  private playlists: Playlist[] = [];
-  
   constructor(private streamingService: StreamingService,
               private modalController: ModalController,
               private electronService: ElectronService) {
@@ -117,6 +96,27 @@ export class HomePage implements AfterViewInit, OnDestroy {
     };
   }
 
+  public channels: StreamChannel[] = [];
+  public activeStreamChannel: StreamChannel;
+  // private rtcpPeerConnection: RTCPeerConnection;
+  private isLiveSteaming = false;
+  private destroyer: Subject<void>;
+  private mainWindow: typeof WindowPeerConnection;
+  private secondWindow: typeof WindowPeerConnection;
+  public previousBackground: string;
+  public currentBackground: string;
+  public animatingBackground = false;
+  public overlayInfo: OverlayInfo = {};
+  public bannerData: BannerData;
+
+  private playlists: Playlist[] = [];
+  private toBase64: (file) => Promise<string> = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+
   ngAfterViewInit(): void {
     this.previousBackground = 'assets/images/background.jpg';
   }
@@ -125,6 +125,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
     this.activeStreamChannel = { ...event };
     setTimeout(() => {
       document.getElementById('active-container').innerHTML = '';
+      let url: string;
       const canvasMediaContainer: any = document.getElementById('active-container') as HTMLCanvasElement;
       switch (event.type) {
         case 'ip-camera':
@@ -137,16 +138,17 @@ export class HomePage implements AfterViewInit, OnDestroy {
           appendWebcam(event.stream, canvasMediaContainer);
           break;
         case 'local-video':
-          appendLocalVideo(event.url, canvasMediaContainer)
-          const canvas = document.getElementById('local-video') as HTMLCanvasElement;
-          event.stream = initLocalVideo(canvas)
-          break
+          appendLocalVideo(event.url, canvasMediaContainer);
+          url = event.url;
+          // const canvas = document.getElementById('local-video') as HTMLCanvasElement;
+          // this.activeStreamChannel.stream = initLocalVideo(canvas);
+          break;
         case 'web-video':
-          appendWebVideo(event.url, canvasMediaContainer)
-          break
+          appendWebVideo(event.url, canvasMediaContainer);
+          break;
       }
-      this.streamingService.onChangeStreamChanel.next(event);
-      this.startLiveStream();
+      this.streamingService.onChangeStreamChanel.next(this.activeStreamChannel);
+      this.startLiveStream(url);
     }, 500);
 
     this.currentBackground = this.activeStreamChannel.preview;
@@ -156,7 +158,11 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
   }
 
-  public async startLiveStream() {
+  public async startLiveStream(url?: string) {
+
+    if (url) {
+      this.sendDataViaIPC('video', url);
+    }
     await this.secondWindow.removeStream();
     await this.mainWindow.removeStream();
     this.mainWindow.attachStream(this.activeStreamChannel.stream);
@@ -194,37 +200,38 @@ export class HomePage implements AfterViewInit, OnDestroy {
     }, 2000);
   }
 
-  addLocalPlaylist = () => {
-    let directory = this.electronService.remote.dialog.showOpenDialogSync({ properties: ['openDirectory']});
-
-    if (directory && directory[0]) {
-      let playlistName: string;
-      
-      if (this.electronService.isWindows) {
-        let directorySplit = directory[0].split('\\');
-        playlistName = directorySplit[directorySplit.length - 1];
-      } else {
-        let directorySplit = directory[0].split('/');
-        playlistName = directorySplit[directorySplit.length - 1];
-      }
-
-      let playlist = new Playlist(playlistName, directory[0]);
-      playlist.readFolder();
-
-      this.playlists.push(playlist);
-    }
-  }
-
-  addWebPlaylist = () => {
-    let link = "https://www.youtube.com/embed/Bi37HFrAYyw?autoplay=1?controls=0"
-
-    if (link) {
-      let playlist = new Playlist(link, link)
-      playlist.readLink()
-
-      this.playlists.push(playlist)
-    }
-  }
+  //
+  // addLocalPlaylist = () => {
+  //   const directory = this.electronService.remote.dialog.showOpenDialogSync({ properties: ['openDirectory'] });
+  //
+  //   if (directory && directory[0]) {
+  //     let playlistName: string;
+  //
+  //     if (this.electronService.isWindows) {
+  //       const directorySplit = directory[0].split('\\');
+  //       playlistName = directorySplit[directorySplit.length - 1];
+  //     } else {
+  //       const directorySplit = directory[0].split('/');
+  //       playlistName = directorySplit[directorySplit.length - 1];
+  //     }
+  //
+  //     const playlist = new Playlist(this.electronService, playlistName, directory[0]);
+  //     playlist.readFolder();
+  //
+  //     this.playlists.push(playlist);
+  //   }
+  // };
+  //
+  // addWebPlaylist = () => {
+  //   const link = 'https://www.youtube.com/embed/Bi37HFrAYyw?autoplay=1?controls=0';
+  //
+  //   if (link) {
+  //     const playlist: Playlist = new Playlist(this.electronService, link, link);
+  //     playlist.readLink();
+  //
+  //     this.playlists.push(playlist);
+  //   }
+  // };
 
   sendToStage = async (file: File) => {
     if (file.name === file.path) {
@@ -235,9 +242,9 @@ export class HomePage implements AfterViewInit, OnDestroy {
         url: file.path,
         preview: file.path,
         stream: null
-      })
+      });
     } else {
-      const canvas = document.getElementById("local-video")
+      // const canvas = document.getElementById('local-video');
 
       this.onChannelChange({
         id: file.path,
@@ -246,15 +253,15 @@ export class HomePage implements AfterViewInit, OnDestroy {
         url: file.path,
         preview: file.path,
         stream: null
-      })
+      });
     }
-  }
+  };
 
   removePlaylist = (playlist: Playlist) => {
-    let index = this.playlists.indexOf(playlist);
-    
+    const index = this.playlists.indexOf(playlist);
+
     this.playlists.splice(index, 1);
-  }
+  };
 
   public async handleFileInput(files: File[]): Promise<void> {
     const logo: string = await this.toBase64(files[0]);
@@ -313,7 +320,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   startOnlineStream() {
     // /Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "Cena 2"
-    //https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
+    // https://github.com/obsproject/obs-studio/wiki/Launch-Parameters
 
     const { exec } = this.electronService.remote.require('child_process');
     if (this.electronService.isWindows) {
@@ -321,25 +328,25 @@ export class HomePage implements AfterViewInit, OnDestroy {
         if (error) {
           console.error(error);
         }
-  
+
         if (stdout) {
           console.log(stdout);
         }
-  
+
         if (stderr) {
           console.error(stderr);
         }
       });
-    } else if(this.electronService.isMacOS) {
+    } else if (this.electronService.isMacOS) {
       exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "ISEP Stream"', (error, stdout, stderr) => {
         if (error) {
           console.error(error);
         }
-  
+
         if (stdout) {
           console.log(stdout);
         }
-  
+
         if (stderr) {
           console.error(stderr);
         }
@@ -356,25 +363,25 @@ export class HomePage implements AfterViewInit, OnDestroy {
         if (error) {
           console.error(error);
         }
-  
+
         if (stdout) {
           console.log(stdout);
         }
-  
+
         if (stderr) {
           console.error(stderr);
         }
       });
-    } else if(this.electronService.isMacOS) {
+    } else if (this.electronService.isMacOS) {
       exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "ISEP Stream"', (error, stdout, stderr) => {
         if (error) {
           console.error(error);
         }
-  
+
         if (stdout) {
           console.log(stdout);
         }
-  
+
         if (stderr) {
           console.error(stderr);
         }
@@ -431,27 +438,24 @@ export function appendWebcam(video: MediaStream, parent: HTMLElement): HTMLVideo
 
 export function initLocalVideo(canvas: any): MediaStream {
   const stream = canvas.captureStream() as MediaStream;
-
-  canvas.setAttribute('id', 'active-element');
-
   return stream;
 }
 
 export function appendLocalVideo(video: string, parent: HTMLElement): HTMLVideoElement {
-  const videoChildren = parent.getElementsByTagName('video')
+  const videoChildren = parent.getElementsByTagName('video');
   Array.from(videoChildren).forEach((videoChild: HTMLVideoElement) => {
-    parent.removeChild(videoChild)
+    parent.removeChild(videoChild);
   });
 
-  const el = document.createElement('video')
-  el.src = video
-  el.autoplay = true
+  const el = document.createElement('video');
+  el.src = video;
+  el.autoplay = true;
 
-  el.setAttribute('id', 'local-video')
+  el.setAttribute('id', 'local-video');
 
-  parent.prepend(el)
+  parent.prepend(el);
 
-  return el
+  return el;
 }
 
 export function initWebVideo(url: string, canvas: any): MediaStream {
@@ -464,15 +468,15 @@ export function initWebVideo(url: string, canvas: any): MediaStream {
 }
 
 export function appendWebVideo(video: string, parent: HTMLElement): HTMLIFrameElement {
-  const iFrameChildren = parent.getElementsByTagName('iframe')
+  const iFrameChildren = parent.getElementsByTagName('iframe');
   Array.from(iFrameChildren).forEach((iFrameChild: HTMLIFrameElement) => {
-    parent.removeChild(iFrameChild)
+    parent.removeChild(iFrameChild);
   });
 
-  const el = document.createElement('iframe')
-  el.src = video
+  const el = document.createElement('iframe');
+  el.src = video;
 
-  parent.prepend(el)
+  parent.prepend(el);
 
-  return el
+  return el;
 }

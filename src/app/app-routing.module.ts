@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { ScreenShareComponent } from './screen-share/screen-share.component';
+import { ScreenShareComponent } from './components/screen-share/screen-share.component';
 import { StreamAreaComponent } from './stream-area/components/stream-area/stream-area.component';
 
 const routes: Routes = [

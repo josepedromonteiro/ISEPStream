@@ -286,6 +286,7 @@ app-home {
   .right {
     flex-grow: 1;
     height: 100%;
+    overflow: hidden;
 
     button {
       padding: 10px 20px;

@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { DesktopCapturerSource } from 'electron';
-import { ScreenShareService } from '../services/screen-share/screen-share.service';
+import { ScreenShareService } from '../../services/screen-share/screen-share.service';
 import { NavParams } from '@ionic/angular';
-import { appendWebcam } from '../home/home.page';
+import { appendWebcam } from '../../home/home.page';
 
 export interface Source extends DesktopCapturerSource {
   image?: string;

@@ -1,8 +1,8 @@
-const {app, TouchBar, nativeImage, ipcMain} = require('electron');
+const {app, TouchBar, nativeImage, ipcMain, BrowserWindow} = require('electron');
 const url = require('url');
 const path = require('path');
 const p2pChannel = require('./scripts/window-rtc.js').main;
-const glasstron = require('glasstron');
+// const glasstron = require('glasstron');
 
 const TIMEOUT = 1000;
 let mainWindow, secondWindow;
@@ -13,7 +13,7 @@ app.commandLine.appendSwitch('enable-transparent-visuals');
 // app.commandLine.appendSwitch('disable-gpu');
 
 function createSecondWindow() {
-    secondWindow = new glasstron.BrowserWindow({
+    secondWindow = new BrowserWindow({
         width: 1100,
         height: 800,
         frame: process.platform === 'win32',
@@ -93,10 +93,6 @@ function createWindow() {
             frame: true,
             resizable: true,
             title: 'ISEP Stream',
-            blur: true,
-            blurType: 'blurbehind',
-            blurGnomeSigma: 100,
-            blurCornerRadius: 30,
             vibrancy: 'fullscreen-ui',
             titleBarStyle: 'hiddenInset',
             webPreferences: {
@@ -107,7 +103,7 @@ function createWindow() {
             }
         };
 
-        mainWindow = new glasstron.BrowserWindow(config);
+        mainWindow = new BrowserWindow(config);
     }
 
     mainWindow.setMenuBarVisibility(false);

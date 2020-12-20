@@ -30,6 +30,7 @@ export class ScreenShareService {
     this.parentElement = parentElement;
     return this.electronService.desktopCapturer
       .getSources({ types: ['window', 'screen'] }).then(async (sources: DesktopCapturerSource[]) => {
+        this.electronService.remote.getGlobal('mainWindow').focus();
         this.openModal(id, sources);
       });
   }

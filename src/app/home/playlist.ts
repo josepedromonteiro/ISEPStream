@@ -43,9 +43,7 @@ export class Playlist {
 
   removeFile(name: string): void {
     const elem: number = this.files.getValue().indexOf(this.files.getValue().filter(f => f.name === name)[0]);
-    console.log(elem);
     this.files.getValue().splice(elem, 1);
-    console.log(this.files);
     this.files.next([...this.files.getValue()]);
   }
 }

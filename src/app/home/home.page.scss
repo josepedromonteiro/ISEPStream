@@ -13,9 +13,14 @@ app-home {
     align-items: center;
     flex-wrap: wrap;
 
+    .side-buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-    ion-button {
-      margin-right: 20px;
+      ion-button {
+        margin-right: 20px;
+      }
     }
 
 
@@ -28,7 +33,14 @@ app-home {
       align-items: center;
       margin-bottom: 15px;
       margin-left: 5px;
-      width: 100%;
+      flex: 1;
+      margin-right: 40px;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* number of lines to show */
+      -webkit-box-orient: vertical;
 
       .live-now {
         opacity: .8;

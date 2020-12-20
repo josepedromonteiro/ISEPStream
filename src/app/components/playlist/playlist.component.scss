@@ -10,8 +10,14 @@ app-playlist {
     margin: auto;
   }
 
-  ion-toolbar {
+  ion-toolbar, ion-header {
     --background: transparent;
+    backdrop-filter: none !important;
+    --opacity: 1 !important;
+
+    .toolbar-container {
+      --opacity: 1 !important;
+    }
   }
 
   .playlist-tabs {
@@ -50,13 +56,14 @@ app-playlist {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      border: 1px solid rgba(var(--ion-color-dark-rgb), 1);
       cursor: pointer;
       backdrop-filter: blur(15px) saturate(180%);
+      transition: var(--transition-all);
 
       &.active {
-        background-color: rgba(var(--ion-color-dark-rgb), 0.8);
-        color: var(--ion-color-light);
+        background-color: rgba(var(--ion-color-dark-rgb), 0.11);
+        color: var(--ion-color-dark);
+        box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.07);
       }
     }
   }
@@ -72,6 +79,24 @@ app-playlist {
     left: 0;
     flex-direction: column;
     z-index: -1;
+
+    .title, .subtitle {
+      max-width: 250px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      opacity: .8;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      margin-bottom: 40px;
+      opacity: .5;
+    }
 
     img {
       height: 150px;
@@ -102,6 +127,7 @@ app-playlist {
     transition: var(--transition-all);
     min-width: 200px;
     border-radius: 50px;
+    color: white;
 
     .toolbar {
       position: sticky;
@@ -165,7 +191,7 @@ app-playlist {
       .options-item {
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         background-color: rgba(0, 0, 0, .1);
         border-radius: 20px;
@@ -186,6 +212,19 @@ app-playlist {
           margin-right: 10px;
         }
       }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .playlist-tab {
+    background-color: rgba(var(--ion-color-light-rgb), 0.5) !important;
+    border: 1px solid rgba(var(--ion-color-dark-rgb), 1) !important;
+
+    &.active {
+      background-color: rgba(var(--ion-color-dark-rgb), 0.8) !important;
+      color: var(--ion-color-light) !important;
+      box-shadow: none;
     }
   }
 }

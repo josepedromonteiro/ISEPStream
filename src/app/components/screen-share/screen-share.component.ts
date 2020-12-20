@@ -20,7 +20,7 @@ export class ScreenShareComponent implements OnInit, AfterViewInit {
   @Output() selectedSource: EventEmitter<Source> = new EventEmitter<Source>();
   public sources: Source[] = [];
 
-  constructor(private screenShareService: ScreenShareService,
+  constructor(public screenShareService: ScreenShareService,
               private navParams: NavParams) {
   }
 
@@ -42,6 +42,8 @@ export class ScreenShareComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     const sources: DesktopCapturerSource[] = this.navParams.get('sources');
-    this.handleSources(sources);
+    setTimeout(() => {
+      this.handleSources(sources);
+    }, 500);
   }
 }

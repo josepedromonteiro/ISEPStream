@@ -17,7 +17,7 @@ export interface PlaylistData {
 export class PlaylistModalComponent implements OnInit {
 
   private openLocalFiles: (name?: string) => Playlist;
-  private playlist: Playlist;
+  public playlist: Playlist;
   private path: string;
   public form: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),

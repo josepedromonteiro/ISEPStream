@@ -1,5 +1,5 @@
 <div class="playlist-container">
-    <ion-header mode="ios" class="ion-no-border">
+    <ion-header mode="ios" class="ion-no-border" [translucent]="false">
         <ion-toolbar>
             <ion-buttons slot="start">
                 <ion-back-button></ion-back-button>
@@ -30,14 +30,14 @@
             </div>
         </div>
         <ng-container *ngIf="playlists.length > 0; else emptyContent">
-            <!--            <br><br><br><br><br>fdhfdhfdhdfh<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>-->
-            <!--            <br><br><br><br><br><br><br><br><br>yreyreyrey<br><br><br><br><br><br><br><br><br><br><br><br><br>-->
-            <!--            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>-->
-            <!--            <br><br><br><br>feghergrey<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>-->
-            <!--            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>-->
-            <!--            <br><br><br><br><br><br><br><br><br><br><br><br>yreyrey<br><br><br><br><br><br><br><br><br><br>-->
-            <!--            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>-->
-            <!--            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>-->
+            <br><br><br><br><br>fdhfdhfdhdfh<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br><br><br><br><br><br>yreyreyrey<br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br>feghergrey<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br><br><br><br><br><br><br><br><br>yreyrey<br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
             <ion-list>
                 <ion-item-sliding *ngFor="let item of activePlaylist?.files | async; let i =index" #itemSliding
                                   (click)="swapItem(itemSliding)">
@@ -81,21 +81,26 @@
                 <ion-icon name="trash-outline"></ion-icon>
                 Remove playlist
             </div>
-<!--            <div class="options-item">-->
-<!--                <div class="flex">-->
-<!--                    <ion-icon name="repeat"></ion-icon>-->
-<!--                    Autoplay-->
-<!--                </div>-->
-<!--                <ion-toggle [(ngModel)]="autoplay"></ion-toggle>-->
-<!--            </div>-->
+            <!--            <div class="options-item">-->
+            <!--                <div class="flex">-->
+            <!--                    <ion-icon name="repeat"></ion-icon>-->
+            <!--                    Autoplay-->
+            <!--                </div>-->
+            <!--                <ion-toggle [(ngModel)]="autoplay"></ion-toggle>-->
+            <!--            </div>-->
         </div>
     </div>
 </div>
 
 <ng-template #emptyContent>
     <div class="empty-container">
-        <img src="assets/images/empty-content.svg" />
-        <ion-button color="dark" (click)="createPlaylist()">
+        <div class="title">
+            There is no playlists yet
+        </div>
+        <div class="subtitle">
+            Click the button to create your first
+        </div>
+        <ion-button (click)="createPlaylist()">
             <ion-icon slot="start" name="add-circle-outline"></ion-icon>
             Add playlist
         </ion-button>

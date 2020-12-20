@@ -46,14 +46,16 @@
                     <ng-template #activeStage>{{activeStreamChannel.name}}
                     </ng-template>
                 </div>
-                <ion-button color="danger" (click)="startOnlineStream()">
-                    <ion-icon slot="start" name="radio"></ion-icon>
-                    Live stream
-                </ion-button>
-                <ion-button color="danger" (click)="startRecording()">
-                    <ion-icon name="radio-button-on" slot="start"></ion-icon>
-                    Record stream
-                </ion-button>
+                <div class="side-buttons">
+                    <ion-button (click)="startOnlineStream()">
+                        <ion-icon slot="start" name="radio"></ion-icon>
+                        Live stream
+                    </ion-button>
+                    <ion-button (click)="startRecording()">
+                        <ion-icon name="radio-button-on" slot="start"></ion-icon>
+                        Record stream
+                    </ion-button>
+                </div>
             </div>
         </div>
         <div class="channel-title">

@@ -14,7 +14,7 @@
     "build::electron": "ionic build && electron .",
     "build::prod::electron": "ionic build --prod && npx electron .",
     "package::mac": "ionic build --prod && electron-packager . --overwrite --asar=true --platform=darwin --arch=x64 --icon=src/assets/native/icon.icns --prune=true --out=release-builds",
-    "package::win": "ionic build --prod && electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --icon=src/assets/native/icon.ico --prune=true --out=release-builds",
+    "package::win": "ionic build --prod && electron-packager . --overwrite --platform=win32 --arch=x64 --icon=src/assets/native/icon.ico --prune=true --out=release-builds",
     "package::linux": "ionic build --prod && electron-packager . --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
     "create-installer::mac": "electron-installer-dmg release-builds/ISEPStream app-darwin-x64/ISEPStream app.app isep-stream-app --out=release-builds --overwrite --icon=src/assets/native/icon.icns",
     "create-installer::win": "node installers/windows/createinstaller.js"

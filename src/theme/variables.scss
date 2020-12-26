@@ -5,6 +5,7 @@
 :root {
   --transition-function: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-all: all .6s var(--transition-function);
+
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;
@@ -76,6 +77,15 @@
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  --ion-background-color: transparent;
+  --ion-background-color-rgb: 0, 0, 0;
+
+  --ion-item-background: #f4f5f8;
+
+  --ion-toolbar-background: #f5f6f9;
+
+  --ion-card-background: #f4f5f8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -226,7 +236,7 @@
     --ion-item-background: #1e1e1e;
 
     --ion-toolbar-background: #1f1f1f;
-
+    
     --ion-tab-bar-background: #1f1f1f;
 
     --ion-card-background: #1e1e1e;

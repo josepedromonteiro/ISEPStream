@@ -2,7 +2,6 @@ const {app, TouchBar, nativeImage, ipcMain, BrowserWindow} = require('electron')
 const url = require('url');
 const path = require('path');
 const p2pChannel = require('./scripts/window-rtc.js').main;
-// const glasstron = require('glasstron');
 
 const TIMEOUT = 1000;
 let mainWindow, secondWindow;
@@ -16,7 +15,7 @@ function createSecondWindow() {
     secondWindow = new BrowserWindow({
         width: 1100,
         height: 800,
-        frame: process.platform === 'win32',
+        frame: false,
         title: 'ISEPStream',
         webPreferences: {
             nodeIntegration: true,
@@ -128,11 +127,11 @@ function createWindow() {
     global.mainWindow = mainWindow;
 
     mainWindow.once('ready-to-show', () => {
-        // setTimeout(() => {
-        //     splash.destroy();
-        //     mainWindow.show();
-        //     mainWindow.focus();
-        // }, TIMEOUT + 500)
+        if (process.platform === 'win32') {
+            mainWindow.maximize();
+        } else {
+            mainWindow.setFullScreen(true);
+        }
     });
 
     setUpTouchBar(mainWindow);

@@ -17,7 +17,7 @@ function createSecondWindow() {
         width: 1100,
         height: 800,
         frame: process.platform === 'win32',
-        title: 'ISEP Stage',
+        title: 'ISEPStream',
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
@@ -74,7 +74,7 @@ function createWindow() {
             width: 1100,
             height: 800,
             frame: false,
-            title: 'ISEP Stream',
+            title: 'ISEPStream',
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
@@ -92,7 +92,7 @@ function createWindow() {
             show: true,
             frame: true,
             resizable: true,
-            title: 'ISEP Stream',
+            title: 'ISEPStream',
             vibrancy: 'fullscreen-ui',
             titleBarStyle: 'hiddenInset',
             webPreferences: {

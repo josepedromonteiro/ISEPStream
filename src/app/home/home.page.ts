@@ -320,14 +320,14 @@ export class HomePage implements AfterViewInit, OnDestroy {
   startOnlineStream() {
     const { exec } = this.electronService.remote.require('child_process')
     if (this.electronService.isWindows) {
-      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startstreaming --scene "ISEP Stream"', (error, _stdout, _stderr) => {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startstreaming --scene "ISEPStream"', (error, _stdout, _stderr) => {
         if (error) {
           console.error(error)
           this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
         }
       })
     } else if(this.electronService.isMacOS) {
-      exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "ISEP Stream"', (error, _stdout, _stderr) => {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startstreaming --scene "ISEPStream"', (error, _stdout, _stderr) => {
         if (error) {
           console.error(error)
           this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
@@ -341,14 +341,14 @@ export class HomePage implements AfterViewInit, OnDestroy {
   startRecording() {
     const { exec } = this.electronService.remote.require('child_process')
     if (this.electronService.isWindows) {
-      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startrecording --scene "ISEP Stream"', (error, _stdout, _stderr) => {
+      exec('cd C:\\"Program Files"\\obs-studio\\bin\\64bit && .\\obs64.exe --startrecording --scene "ISEPStream"', (error, _stdout, _stderr) => {
         if (error) {
           console.error(error)
           this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
         }
       })
     } else if(this.electronService.isMacOS) {
-      exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "ISEP Stream"', (error, _stdout, _stderr) => {
+      exec('/Applications/OBS.app/Contents/MacOS/OBS --startrecording --scene "ISEPStream"', (error, _stdout, _stderr) => {
         if (error) {
           console.error(error)
           this.presentAlert('OBS Not Installed', 'OBS is not installed on this system. Please make sure you download and install OBS before using this feature.')
